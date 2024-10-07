@@ -13,7 +13,7 @@ if Code.ensure_loaded?(Playwright.Page) do
     defstruct [:page, within: :none]
 
     @endpoint Application.compile_env(:phoenix_test, :endpoint)
-    @default_timeout :timer.seconds(1)
+    @default_timeout :timer.seconds(5)
 
     def build(page, path) do
       base_url = Application.fetch_env!(:phoenix_test, :base_url)
