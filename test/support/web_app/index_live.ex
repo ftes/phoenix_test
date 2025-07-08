@@ -67,6 +67,9 @@ defmodule PhoenixTest.WebApp.IndexLive do
       <input name="checkbox" type="checkbox" value="not_checked" />
       <input name="checkbox" type="checkbox" value="checked" checked />
 
+      <label for="checkbox?">Checkbox with question mark</label>
+      <input name="checkbox?" id="checkbox?" type="checkbox" value="checked" />
+
       <input name="radio" type="radio" value="not_checked" />
       <input name="radio" type="radio" value="checked" checked />
 

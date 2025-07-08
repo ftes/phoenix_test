@@ -535,6 +535,14 @@ defmodule PhoenixTest.LiveTest do
       |> assert_has("#form-data", text: "admin: on")
     end
 
+    test "checks a checkbox with question mark in name", %{conn: conn} do
+      conn
+      |> visit("/live/index")
+      |> check("Checkbox with question mark")
+      |> submit()
+      |> assert_has("#form-data", text: "checkbox?: checked")
+    end
+
     test "can check an unchecked checkbox", %{conn: conn} do
       conn
       |> visit("/live/index")
