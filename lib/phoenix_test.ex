@@ -1311,6 +1311,11 @@ defmodule PhoenixTest do
 
   NOTE that you cannot specify both `:text` and `:value` as options.
 
+  The `:text` or `:value` option can be a binary or anything for which
+  there is an implementation of the `Phoenix.HTML.Safe` protocol. PhoenixTest
+  uses that protocol to convert the argument to a binary then looks for the
+  converted value.
+
   ## Options
 
   - `text`: the text contents to look for.
@@ -1370,12 +1375,12 @@ defmodule PhoenixTest do
   @doc group: "Assertions"
   def assert_has(session, selector, opts_or_text)
 
-  def assert_has(session, selector, text) when is_binary(text) do
-    Driver.assert_has(session, selector, text: text)
-  end
-
   def assert_has(session, selector, opts) when is_list(opts) do
     Driver.assert_has(session, selector, opts)
+  end
+
+  def assert_has(session, selector, text) do
+    Driver.assert_has(session, selector, text: text)
   end
 
   @doc """
@@ -1394,7 +1399,7 @@ defmodule PhoenixTest do
   ```
   """
   @doc group: "Assertions"
-  def assert_has(session, selector, text, opts) when is_binary(text) and is_list(opts) do
+  def assert_has(session, selector, text, opts) when is_list(opts) do
     validate_no_duplicate_text_opt!(opts, "assert_has", selector, text)
 
     Driver.assert_has(session, selector, Keyword.put(opts, :text, text))
@@ -1428,6 +1433,11 @@ defmodule PhoenixTest do
   It'll raise an error if any elements that match selector and options.
 
   NOTE that you cannot specify both `:text` and `:value` as options.
+
+  The `:text` or `:value` option can be a binary or anything for which
+  there is an implementation of the `Phoenix.HTML.Safe` protocol. PhoenixTest
+  uses that protocol to convert the argument to a binary, then looks for the
+  converted value.
 
   ## Options
 
@@ -1484,12 +1494,12 @@ defmodule PhoenixTest do
   ```
   """
   @doc group: "Assertions"
-  def refute_has(session, selector, text) when is_binary(text) do
-    Driver.refute_has(session, selector, text: text)
-  end
-
   def refute_has(session, selector, opts) when is_list(opts) do
     Driver.refute_has(session, selector, opts)
+  end
+
+  def refute_has(session, selector, text) do
+    Driver.refute_has(session, selector, text: text)
   end
 
   @doc """
@@ -1510,7 +1520,7 @@ defmodule PhoenixTest do
   ```
   """
   @doc group: "Assertions"
-  def refute_has(session, selector, text, opts) when is_binary(text) and is_list(opts) do
+  def refute_has(session, selector, text, opts) when is_list(opts) do
     validate_no_duplicate_text_opt!(opts, "refute_has", selector, text)
 
     Driver.refute_has(session, selector, Keyword.put(opts, :text, text))
