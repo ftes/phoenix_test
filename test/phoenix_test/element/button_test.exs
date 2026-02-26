@@ -235,6 +235,46 @@ defmodule PhoenixTest.Element.ButtonTest do
     end
   end
 
+  describe "associated_to_form?" do
+    test "returns true if button has a form ancestor even with type='button'" do
+      html = """
+      <form>
+        <button type="button">
+          Save
+        </button>
+      </form>
+      """
+
+      button = Button.find!(html, "button", "Save")
+
+      assert Button.associated_to_form?(button, html)
+    end
+
+    test "returns true if button has a form attribute" do
+      html = """
+      <button form="form-id">
+        Save
+      </button>
+      """
+
+      button = Button.find!(html, "button", "Save")
+
+      assert Button.associated_to_form?(button, html)
+    end
+
+    test "returns false if button stands alone" do
+      html = """
+      <button>
+        Save
+      </button>
+      """
+
+      button = Button.find!(html, "button", "Save")
+
+      refute Button.associated_to_form?(button, html)
+    end
+  end
+
   describe "phx_click?" do
     test "returns true if button has a phx-click attribute" do
       html = """

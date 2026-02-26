@@ -75,6 +75,38 @@ defmodule PhoenixTest.Element.FormTest do
     end
   end
 
+  describe "has_descendant?" do
+    test "returns true when descendant has form ancestor" do
+      html = """
+      <form id="user-form">
+        <label>
+          Email
+          <input type="text" name="email" />
+        </label>
+      </form>
+      """
+
+      field = Field.find_input!(html, "input", "Email", exact: true)
+
+      assert Form.has_descendant?(html, field)
+    end
+
+    test "returns false when descendant has no form ancestor" do
+      html = """
+      <div>
+        <label>
+          Email
+          <input type="text" name="email" />
+        </label>
+      </div>
+      """
+
+      field = Field.find_input!(html, "input", "Email", exact: true)
+
+      refute Form.has_descendant?(html, field)
+    end
+  end
+
   describe "form.selector" do
     test "form's selector is id if id is present" do
       html = """

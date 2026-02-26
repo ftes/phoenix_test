@@ -2,6 +2,7 @@ defmodule PhoenixTest.Element.Select do
   @moduledoc false
 
   alias PhoenixTest.Element
+  alias PhoenixTest.Element.Form
   alias PhoenixTest.Html
   alias PhoenixTest.LiveViewBindings
   alias PhoenixTest.Query
@@ -65,9 +66,6 @@ defmodule PhoenixTest.Element.Select do
   end
 
   def belongs_to_form?(field, html) do
-    case Query.find_ancestor(html, "form", field.selector) do
-      {:found, _} -> true
-      _ -> false
-    end
+    Form.has_descendant?(html, field)
   end
 end

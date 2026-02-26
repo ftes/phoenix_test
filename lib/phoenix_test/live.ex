@@ -121,7 +121,7 @@ defmodule PhoenixTest.Live do
           #{inspect(button.text)} because it is disabled.
         """
 
-      click_action == :dispatch_change and button_associated_to_form?(button, html) ->
+      click_action == :dispatch_change and Button.associated_to_form?(button, html) ->
         trigger_button_dispatch_change(session, button)
 
       click_action == :render_click ->
@@ -157,10 +157,6 @@ defmodule PhoenixTest.Live do
           #{inspect(button.text)} to have a valid `phx-click` attribute or belong to a `form` element.
         """
     end
-  end
-
-  defp button_associated_to_form?(button, html) do
-    button.form_id || match?({:found, _}, Query.find_ancestor(html, "form", {button.selector, button.text}))
   end
 
   defp trigger_button_dispatch_change(session, button) do

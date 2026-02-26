@@ -32,6 +32,13 @@ defmodule PhoenixTest.Element.Form do
     |> build()
   end
 
+  def has_descendant?(html, descendant) do
+    case Query.find_ancestor(html, "form", descendant_selector(descendant)) do
+      {:found, _} -> true
+      _ -> false
+    end
+  end
+
   defp build(%LazyHTML{} = form) do
     id = Html.attribute(form, "id")
     action = Html.attribute(form, "action")
