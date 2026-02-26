@@ -215,7 +215,7 @@ defmodule PhoenixTest.FormDataTest do
 
       list = FormData.to_list(form_data)
 
-      assert list == [{"email", "frodo@fellowship.com"}, {"name", "frodo"}]
+      assert list == [{"name", "frodo"}, {"email", "frodo@fellowship.com"}]
     end
 
     test "preserves select options ordering" do

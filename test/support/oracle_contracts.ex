@@ -254,7 +254,7 @@ defmodule PhoenixTest.OracleContracts do
       path: "/page/contracts/c025",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c025-form"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C026",
@@ -262,7 +262,7 @@ defmodule PhoenixTest.OracleContracts do
       path: "/page/contracts/c026",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c026-form"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C027",
@@ -270,7 +270,7 @@ defmodule PhoenixTest.OracleContracts do
       path: "/page/contracts/c027",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c027-form"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C028",
@@ -278,7 +278,7 @@ defmodule PhoenixTest.OracleContracts do
       path: "/page/contracts/c028",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c028-form"},
-      expected: :mismatch
+      expected: :match
     }
   ]
 

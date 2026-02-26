@@ -5,9 +5,21 @@ defmodule PhoenixTest.FormData do
   alias PhoenixTest.Element.Field
   alias PhoenixTest.Element.Select
 
-  defstruct data: %{}
+  defstruct data: %{}, entries: []
 
-  def new, do: %__MODULE__{}
+  def new(opts \\ []) when is_list(opts) do
+    struct!(__MODULE__, Keyword.merge([data: %{}, entries: []], opts))
+  end
+
+  def from_entries(entries) when is_list(entries) do
+    normalized_entries =
+      Enum.map(entries, fn {name, value} -> {to_string(name), value} end)
+
+    %__MODULE__{
+      entries: normalized_entries,
+      data: data_from_entries(normalized_entries)
+    }
+  end
 
   def add_data(%__MODULE__{} = form_data, {name, value}) do
     add_data(form_data, name, value)
@@ -31,68 +43,103 @@ defmodule PhoenixTest.FormData do
     end)
   end
 
-  def add_data(%__MODULE__{} = form_data, name, value) when is_nil(name) or is_nil(value), do: form_data
-
-  def add_data(%__MODULE__{} = form_data, name, value) do
+  def add_data(%__MODULE__{} = form_data, name, value) when is_binary(name) and is_list(value) do
     if allows_multiple_values?(name) do
-      new_data =
-        Map.update(form_data.data, name, List.wrap(value), fn existing_value ->
-          if value in existing_value do
-            existing_value
-          else
-            existing_value ++ List.wrap(value)
-          end
-        end)
-
-      %__MODULE__{form_data | data: new_data}
+      Enum.reduce(value, form_data, fn item, acc ->
+        add_single_entry(acc, name, item)
+      end)
     else
-      %__MODULE__{form_data | data: Map.put(form_data.data, name, value)}
+      entries =
+        form_data.entries
+        |> Enum.reject(fn {existing_name, _existing_value} -> existing_name == name end)
+        |> Kernel.++(Enum.map(value, &{name, &1}))
+
+      %__MODULE__{form_data | entries: entries, data: data_from_entries(entries)}
     end
   end
 
-  def merge(%__MODULE__{data: data1}, %__MODULE__{data: data2}) do
-    data =
-      Map.merge(data1, data2, fn k, v1, v2 ->
-        if allows_multiple_values?(k) do
-          Enum.uniq(v1 ++ v2)
-        else
-          v2
-        end
-      end)
+  def add_data(%__MODULE__{} = form_data, name, value) when is_nil(name) or is_nil(value), do: form_data
 
-    %__MODULE__{data: data}
+  def add_data(%__MODULE__{} = form_data, name, value) do
+    name = to_string(name)
+
+    add_single_entry(form_data, name, value)
+  end
+
+  def merge(%__MODULE__{} = left, %__MODULE__{} = right) do
+    right.entries
+    |> Enum.group_by(fn {name, _value} -> name end, fn {_name, value} -> value end)
+    |> Enum.reduce(left, fn {name, values}, acc ->
+      merge_name_values(acc, name, values)
+    end)
   end
 
   defp allows_multiple_values?(field_name), do: String.ends_with?(field_name, "[]")
 
-  def filter(%__MODULE__{data: data}, fun) do
-    data =
-      data
-      |> Enum.filter(fn {name, value} -> fun.(%{name: name, value: value}) end)
-      |> Map.new()
+  def filter(%__MODULE__{entries: entries}, fun) do
+    filtered_entries =
+      Enum.filter(entries, fn {name, value} ->
+        fun.(%{name: name, value: value})
+      end)
 
-    %__MODULE__{data: data}
+    from_entries(filtered_entries)
   end
 
-  def empty?(%__MODULE__{data: data}) do
-    Enum.empty?(data)
+  def empty?(%__MODULE__{entries: entries}) do
+    Enum.empty?(entries)
   end
 
-  def has_data?(%__MODULE__{data: data}, name, value) do
-    field_data = Map.get(data, name, [])
-
-    value == field_data or value in List.wrap(field_data)
-  end
-
-  def to_list(%__MODULE__{data: data}) do
-    data
-    |> Enum.map(fn
-      {key, values} when is_list(values) ->
-        Enum.map(values, &{key, &1})
-
-      {_key, _value} = field ->
-        field
+  def has_data?(%__MODULE__{entries: entries}, name, value) do
+    Enum.any?(entries, fn {entry_name, entry_value} ->
+      entry_name == name and entry_value == value
     end)
-    |> List.flatten()
+  end
+
+  def to_list(%__MODULE__{entries: entries}) do
+    entries
+  end
+
+  defp add_single_entry(%__MODULE__{entries: entries} = form_data, name, value) do
+    entries =
+      if allows_multiple_values?(name) do
+        if {name, value} in entries, do: entries, else: entries ++ [{name, value}]
+      else
+        entries
+        |> Enum.reject(fn {existing_name, _existing_value} -> existing_name == name end)
+        |> Kernel.++([{name, value}])
+      end
+
+    %__MODULE__{form_data | entries: entries, data: data_from_entries(entries)}
+  end
+
+  defp merge_name_values(%__MODULE__{entries: entries} = form_data, name, values) do
+    entries =
+      if allows_multiple_values?(name) do
+        Enum.reduce(values, entries, fn value, acc ->
+          if {name, value} in acc, do: acc, else: acc ++ [{name, value}]
+        end)
+      else
+        entries
+        |> Enum.reject(fn {existing_name, _existing_value} -> existing_name == name end)
+        |> Kernel.++(Enum.map(values, &{name, &1}))
+      end
+
+    %__MODULE__{form_data | entries: entries, data: data_from_entries(entries)}
+  end
+
+  defp data_from_entries(entries) do
+    Enum.reduce(entries, %{}, fn {name, value}, acc ->
+      if allows_multiple_values?(name) do
+        Map.update(acc, name, [value], fn existing_values ->
+          if value in existing_values do
+            existing_values
+          else
+            existing_values ++ [value]
+          end
+        end)
+      else
+        Map.put(acc, name, value)
+      end
+    end)
   end
 end

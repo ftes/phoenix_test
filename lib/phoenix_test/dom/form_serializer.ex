@@ -15,6 +15,6 @@ defmodule PhoenixTest.DOM.FormSerializer do
   Builds `PhoenixTest.FormData` from successful control entries.
   """
   def to_form_data(%LazyHTML{} = form) do
-    FormData.add_data(FormData.new(), SuccessfulControls.entries(form))
+    FormData.from_entries(SuccessfulControls.entries(form))
   end
 end
