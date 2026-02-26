@@ -248,5 +248,14 @@ defmodule PhoenixTest.FormDataTest do
 
       assert data == [{"email", "third_value"}]
     end
+
+    test "preserves repeated non-array names in insertion order (hidden fallback + checkbox)" do
+      form_data =
+        FormData.new()
+        |> FormData.add_data("subscribe", "off")
+        |> FormData.add_data("subscribe", "on")
+
+      assert FormData.to_list(form_data) == [{"subscribe", "off"}, {"subscribe", "on"}]
+    end
   end
 end
