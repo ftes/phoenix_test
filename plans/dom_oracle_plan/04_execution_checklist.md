@@ -296,6 +296,30 @@ DoD:
 2. `Static` and `Live` call shared planner helpers for merge/validation/submitter logic.
 3. One full `mix test` run passes.
 
+## Phase 15 High-Frequency Form Parity Expansion (Current)
+
+Findings:
+
+1. `C017` (`input[type=image]`) is valid but lower-frequency than repeated-name and ordering behavior in everyday forms.
+2. Current matrix does not explicitly lock down repeated-name semantics (multiple controls sharing one `name`) and duplicate entry handling.
+3. These patterns have higher product impact because they appear in multi-select/checkbox groups and dynamic form builders.
+
+Next steps:
+
+1. Add new shared contracts (`C025+`) targeting repeated names and ordering-sensitive scenarios:
+   - repeated non-`[]` names across multiple controls,
+   - repeated `[]` names with duplicate values,
+   - mixed hidden + checkbox combinations with repeated names.
+2. Keep fixtures deterministic and minimal; one rule per contract.
+3. Start with expected `:mismatch` where current behavior is intentionally tracked but not fixed yet.
+4. After matrix expansion, prioritize fixes for the highest-frequency mismatches before returning to `C017`.
+
+DoD:
+
+1. Added contracts run on both static and live surfaces through `contracts_parity_test.exs`.
+2. Matrix clearly marks which high-frequency cases are currently mismatches.
+3. One full `mix test` run passes.
+
 ## Suggested Commit Boundaries
 
 1. `test(dom-oracle): add playwright runner and exunit wrapper`
