@@ -7,6 +7,7 @@ defmodule PhoenixTest.Static do
   alias PhoenixTest.ConnHandler
   alias PhoenixTest.DataAttributeForm
   alias PhoenixTest.DOM.ConstraintValidation
+  alias PhoenixTest.DOM.SubmissionPlan
   alias PhoenixTest.DOM.Submitter
   alias PhoenixTest.Element.Button
   alias PhoenixTest.Element.Field
@@ -14,7 +15,6 @@ defmodule PhoenixTest.Static do
   alias PhoenixTest.Element.Link
   alias PhoenixTest.Element.Select
   alias PhoenixTest.FileUpload
-  alias PhoenixTest.FormData
   alias PhoenixTest.FormPayload
   alias PhoenixTest.Html
   alias PhoenixTest.Locators
@@ -104,7 +104,7 @@ defmodule PhoenixTest.Static do
 
       Button.belongs_to_form?(button, html) ->
         form = Button.parent_form!(button, html)
-        form_data = merged_form_data(form, active_form)
+        form_data = SubmissionPlan.merge_active_form_data(form, active_form.selector, active_form.form_data)
 
         if ConstraintValidation.valid_for_submit?(form, form_data, button) do
           if active_form.selector == form.selector do
@@ -238,7 +238,7 @@ defmodule PhoenixTest.Static do
     session = set_operation!(session, :submit_form)
 
     form = Form.find!(session.current_operation.html, selector)
-    merged = FormData.merge(form.form_data, form_data)
+    merged = SubmissionPlan.merge_form_data(form, form_data)
 
     if ConstraintValidation.valid_for_submit?(form, merged, submitter) do
       to_submit = build_payload(form, ActiveForm.new(form_data: form_data), submitter)
@@ -290,8 +290,9 @@ defmodule PhoenixTest.Static do
 
   defp submit_active_form(session, form, submitter) do
     active_form = session.active_form
+    merged = SubmissionPlan.merge_active_form_data(form, active_form.selector, active_form.form_data)
 
-    if ConstraintValidation.valid_for_submit?(form, merged_form_data(form, active_form), submitter) do
+    if ConstraintValidation.valid_for_submit?(form, merged, submitter) do
       session
       |> Map.put(:active_form, ActiveForm.new())
       |> perform_submit(form, build_payload(form, active_form, submitter), submitter)
@@ -322,21 +323,13 @@ defmodule PhoenixTest.Static do
 
   defp build_payload(form, active_form, submitter) do
     form_data =
-      form.form_data
-      |> FormData.merge(active_form.form_data)
-      |> FormData.merge(Submitter.submitter_data(submitter))
+      form
+      |> SubmissionPlan.merge_form_data(active_form.form_data)
+      |> SubmissionPlan.merge_submitter_data(submitter)
 
     form_data
     |> FormPayload.new()
     |> FormPayload.add_form_data(active_form.uploads)
-  end
-
-  defp merged_form_data(form, active_form) do
-    if active_form.selector == form.selector do
-      FormData.merge(form.form_data, active_form.form_data)
-    else
-      form.form_data
-    end
   end
 
   defp maybe_redirect(conn, session) do

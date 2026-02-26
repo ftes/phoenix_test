@@ -8,7 +8,7 @@ defmodule PhoenixTest.Live do
   alias PhoenixTest.Assertions
   alias PhoenixTest.ConnHandler
   alias PhoenixTest.DOM.ConstraintValidation
-  alias PhoenixTest.DOM.Submitter
+  alias PhoenixTest.DOM.SubmissionPlan
   alias PhoenixTest.Element.Button
   alias PhoenixTest.Element.Field
   alias PhoenixTest.Element.Form
@@ -131,13 +131,7 @@ defmodule PhoenixTest.Live do
       Button.belongs_to_form?(button, html) ->
         active_form = session.active_form
         form = Button.parent_form!(button, html)
-
-        form_data =
-          if active_form.selector == form.selector do
-            FormData.merge(form.form_data, active_form.form_data)
-          else
-            form.form_data
-          end
+        form_data = SubmissionPlan.merge_active_form_data(form, active_form.selector, active_form.form_data)
 
         if ConstraintValidation.valid_for_submit?(form, form_data, button) do
           session
@@ -470,7 +464,7 @@ defmodule PhoenixTest.Live do
   end
 
   defp merged_form_data(session, form) do
-    FormData.merge(form.form_data, session.active_form.form_data)
+    SubmissionPlan.merge_form_data(form, session.active_form.form_data)
   end
 
   def submit(session) do
@@ -497,9 +491,9 @@ defmodule PhoenixTest.Live do
     form = Form.find!(session.current_operation.html, selector)
 
     form_data = remove_data_for_fields_that_have_been_removed(form_data, form, session.current_operation.html)
-    form_data = FormData.merge(form.form_data, form_data)
+    form_data = SubmissionPlan.merge_form_data(form, form_data)
 
-    additional_data = FormData.merge(Submitter.submitter_data(submitter), additional_data)
+    additional_data = SubmissionPlan.merge_additional_data(additional_data, submitter)
 
     cond do
       not ConstraintValidation.valid_for_submit?(form, form_data, submitter) ->
