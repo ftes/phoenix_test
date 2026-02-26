@@ -314,6 +314,10 @@ Next steps:
 3. Start with expected `:mismatch` where current behavior is intentionally tracked but not fixed yet.
 4. After matrix expansion, prioritize fixes for the highest-frequency mismatches before returning to `C017`.
 
+Progress:
+
+1. `C025`-`C028` were added and are now `:match` on both static and live surfaces after `FormData` entry-order/preservation updates.
+
 DoD:
 
 1. Added contracts run on both static and live surfaces through `contracts_parity_test.exs`.
