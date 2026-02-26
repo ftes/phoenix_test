@@ -217,6 +217,13 @@ defmodule PhoenixTest.LiveTest do
       |> assert_has("#form-data", text: "form-button: save-owner-form")
     end
 
+    test "does not submit owner form when external associated button is type=button", %{conn: conn} do
+      conn
+      |> visit("/live/index")
+      |> click_button("External Non Submit")
+      |> refute_has("#form-data", text: "non_submit_owner_name: Aragorn")
+    end
+
     test "follows form's redirect to live page", %{conn: conn} do
       conn
       |> visit("/live/index")

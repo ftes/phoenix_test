@@ -243,6 +243,12 @@ defmodule PhoenixTest.WebApp.PageView do
     </form>
     <button form="owner-form">Save Owner Form</button>
 
+    <form action="/page/create_record" method="post" id="non-submit-owner-form">
+      <label for="non-submit-owner-form-name">Non Submit Owner Name</label>
+      <input type="text" id="non-submit-owner-form-name" name="non_submit_owner_name" value="Aragorn" />
+    </form>
+    <button type="button" form="non-submit-owner-form">External Non Submit</button>
+
     <form id="complex-labels" method="post" action="/page/create_record">
       <label for="complex-name">
         Name <span>*</span>

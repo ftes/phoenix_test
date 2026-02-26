@@ -204,6 +204,13 @@ defmodule PhoenixTest.StaticTest do
       |> assert_has("#form-data", text: "name: Aragorn")
     end
 
+    test "does not submit owner form when external associated button is type=button", %{conn: conn} do
+      conn
+      |> visit("/page/index")
+      |> click_button("External Non Submit")
+      |> refute_has("#form-data", text: "non_submit_owner_name: Aragorn")
+    end
+
     test "can handle redirects to a LiveView", %{conn: conn} do
       conn
       |> visit("/page/index")

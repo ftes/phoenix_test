@@ -147,6 +147,13 @@ defmodule PhoenixTest.WebApp.IndexLive do
       Save Owner Form
     </button>
 
+    <form id="non-submit-owner-form" phx-submit="save-form">
+      <label for="non-submit-owner-name">Non Submit Owner Name</label>
+      <input id="non-submit-owner-name" name="non_submit_owner_name" value="Aragorn" />
+    </form>
+
+    <button type="button" form="non-submit-owner-form">External Non Submit</button>
+
     <button type="button" phx-click={JS.toggle()} disabled>Disabled button 1</button>
 
     <form id="nested-form" phx-submit="save-form">
