@@ -247,6 +247,38 @@ defmodule PhoenixTest.OracleContracts do
       ],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c024-form-a"},
       expected: :match
+    },
+    %{
+      id: "C025",
+      name: "checked hidden fallback retains both entries for same non-array name",
+      path: "/page/contracts/c025",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c025-form"},
+      expected: :mismatch
+    },
+    %{
+      id: "C026",
+      name: "multiple checked checkboxes with same non-array name keep all entries",
+      path: "/page/contracts/c026",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c026-form"},
+      expected: :mismatch
+    },
+    %{
+      id: "C027",
+      name: "repeated text controls with same non-array name keep ordered entries",
+      path: "/page/contracts/c027",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c027-form"},
+      expected: :mismatch
+    },
+    %{
+      id: "C028",
+      name: "array names preserve duplicate values",
+      path: "/page/contracts/c028",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c028-form"},
+      expected: :mismatch
     }
   ]
 

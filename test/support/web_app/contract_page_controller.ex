@@ -419,5 +419,67 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
+  def contract_html("c025") do
+    """
+    <main data-contract="c025">
+      <h1>C025</h1>
+
+      <form id="c025-form" action="/page/create_record" method="post">
+        <input type="hidden" name="notify" value="off" />
+        <label for="c025-notify">Notify</label>
+        <input id="c025-notify" type="checkbox" name="notify" value="on" checked />
+      </form>
+    </main>
+    """
+  end
+
+  def contract_html("c026") do
+    """
+    <main data-contract="c026">
+      <h1>C026</h1>
+
+      <form id="c026-form" action="/page/create_record" method="post">
+        <label for="c026-role-admin">Role Admin</label>
+        <input id="c026-role-admin" type="checkbox" name="role" value="admin" checked />
+
+        <label for="c026-role-editor">Role Editor</label>
+        <input id="c026-role-editor" type="checkbox" name="role" value="editor" checked />
+      </form>
+    </main>
+    """
+  end
+
+  def contract_html("c027") do
+    """
+    <main data-contract="c027">
+      <h1>C027</h1>
+
+      <form id="c027-form" action="/page/create_record" method="post">
+        <label for="c027-tag-a">Tag A</label>
+        <input id="c027-tag-a" type="text" name="tag" value="one" />
+
+        <label for="c027-tag-b">Tag B</label>
+        <input id="c027-tag-b" type="text" name="tag" value="two" />
+      </form>
+    </main>
+    """
+  end
+
+  def contract_html("c028") do
+    """
+    <main data-contract="c028">
+      <h1>C028</h1>
+
+      <form id="c028-form" action="/page/create_record" method="post">
+        <label for="c028-role-a">Role A</label>
+        <input id="c028-role-a" type="checkbox" name="roles[]" value="viewer" checked />
+
+        <label for="c028-role-b">Role B</label>
+        <input id="c028-role-b" type="checkbox" name="roles[]" value="viewer" checked />
+      </form>
+    </main>
+    """
+  end
+
   def contract_html(_), do: nil
 end
