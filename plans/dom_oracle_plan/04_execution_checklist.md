@@ -208,6 +208,33 @@ DoD:
 2. Publicly-relevant helper functions have brief docstrings citing the rule source.
 3. Docs clearly separate browser-spec behavior from `phoenix_test` compatibility behavior.
 
+## Phase 11 Live Oracle Parity Contracts
+
+Create files:
+
+1. `test/support/web_app/live_contracts.ex`
+2. `test/support/web_app/contract_live.ex`
+3. `test/phoenix_test/dom_oracle/contracts_live_parity_test.exs`
+
+Update files:
+
+1. `test/support/web_app/router.ex` add `/live/contracts/:contract` route.
+2. `test/phoenix_test/dom_oracle/contracts_test.exs` extract/share contract matrix if needed.
+
+Work items:
+
+1. Build LiveView fixtures matching each static contract (`C001`..`C018`) with equivalent DOM structure and submit targets.
+2. Reuse the same contract definitions, expected statuses, and capture types for both static and live parity suites.
+3. Run oracle against `/live/contracts/:id` and compare to `phoenix_test` live flow outputs.
+4. Keep `C017` ignored in live parity until image-coordinate behavior is implemented.
+5. Add failure diagnostics mirroring static contracts (failed step index/op + normalized diff payload).
+
+DoD:
+
+1. `mix test test/phoenix_test/dom_oracle/contracts_live_parity_test.exs` passes.
+2. `mix test test/phoenix_test/dom_oracle` passes with both static and live parity suites enabled.
+3. For each non-ignored contract, static and live suites have aligned expected states (`:match` or `:mismatch`).
+
 ## Suggested Commit Boundaries
 
 1. `test(dom-oracle): add playwright runner and exunit wrapper`
@@ -219,6 +246,7 @@ DoD:
 7. `test(dom-oracle): add systematic divergence discovery matrix`
 8. `docs: add conformance notes and upgrade guide`
 9. `docs(dom): add spec-linked moduledocs for form/rules modules`
+10. `test(dom-oracle): add live contract fixtures and parity suite`
 
 ## Minimal Acceptance Gate
 
