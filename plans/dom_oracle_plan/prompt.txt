@@ -1,0 +1,13 @@
+I'm considering an architectural change or rebuild.
+I want to use flexible selectors (similar to what Plyawright offers). See ../ptp (PhoenxiTestPlaywright).
+Also, I want to better ensure we are aligned with DOM spec for HTML (and HTTP?).
+
+It feels like PhoenixTest encapsulates a lot of DOM spec knowledge, without making it explicit (especially simulating how forms behave).
+
+Check the code base, check what playwright (especially vanilla JS client) does.
+Cross-check my opinion.
+
+Make suggestions.
+Can we use a 'DOM simulation' to improve the implementation?
+Automated tests for DOM spec adherence?
+Correlate with browser implementation or browser based tests as ultimate source of truth?
