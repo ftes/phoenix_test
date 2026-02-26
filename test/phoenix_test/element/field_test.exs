@@ -130,6 +130,26 @@ defmodule PhoenixTest.Element.FieldTest do
         Field.find_hidden_uncheckbox!(html, "input", "Yes", exact: true)
       end
     end
+
+    test "scopes hidden fallback lookup to the same form owner" do
+      html = """
+      <form id="form-a">
+        <input type="hidden" name="subscribe" value="off_a" />
+        <label for="subscribe-a">Subscribe A</label>
+        <input id="subscribe-a" type="checkbox" name="subscribe" value="on_a" />
+      </form>
+
+      <form id="form-b">
+        <input type="hidden" name="subscribe" value="off_b" />
+        <label for="subscribe-b">Subscribe B</label>
+        <input id="subscribe-b" type="checkbox" name="subscribe" value="on_b" />
+      </form>
+      """
+
+      field = Field.find_hidden_uncheckbox!(html, "input", "Subscribe A", exact: true)
+
+      assert field.value == "off_a"
+    end
   end
 
   describe "phx_click?" do
@@ -179,6 +199,19 @@ defmodule PhoenixTest.Element.FieldTest do
       field = Field.find_input!(html, "input", "Name", exact: true)
 
       refute Field.belongs_to_form?(field, html)
+    end
+
+    test "returns true if field has a form attribute that references a form" do
+      html = """
+      <form id="owner-form"></form>
+
+      <label for="name">Name</label>
+      <input id="name" form="owner-form" type="text" name="name" value="Hello world"/>
+      """
+
+      field = Field.find_input!(html, "input", "Name", exact: true)
+
+      assert Field.belongs_to_form?(field, html)
     end
   end
 

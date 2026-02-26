@@ -1,6 +1,7 @@
 defmodule PhoenixTest.Element.Button do
   @moduledoc false
 
+  alias PhoenixTest.DOM.FormOwner
   alias PhoenixTest.Element
   alias PhoenixTest.Element.Form
   alias PhoenixTest.Html
@@ -89,10 +90,9 @@ defmodule PhoenixTest.Element.Button do
   end
 
   def parent_form!(%__MODULE__{} = button, html) do
-    if button.form_id do
-      Form.find!(html, "[id=#{inspect(button.form_id)}]")
-    else
-      Form.find_by_descendant!(html, button)
+    case FormOwner.owner_form_selector(button, html) do
+      nil -> Form.find_by_descendant!(html, button)
+      selector -> Form.find!(html, selector)
     end
   end
 end

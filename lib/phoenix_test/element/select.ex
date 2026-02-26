@@ -1,6 +1,7 @@
 defmodule PhoenixTest.Element.Select do
   @moduledoc false
 
+  alias PhoenixTest.DOM.FormOwner
   alias PhoenixTest.Element
   alias PhoenixTest.Html
   alias PhoenixTest.LiveViewBindings
@@ -65,9 +66,6 @@ defmodule PhoenixTest.Element.Select do
   end
 
   def belongs_to_form?(field, html) do
-    case Query.find_ancestor(html, "form", field.selector) do
-      {:found, _} -> true
-      _ -> false
-    end
+    !!FormOwner.owner_form_selector(field, html)
   end
 end

@@ -18,7 +18,7 @@ Align `phoenix_test` form and selector behavior more closely with browser/HTML b
 ## Primary Strategy
 
 1. Build browser oracle first.
-2. Define spec contract fixtures and expected outcomes.
+2. Define spec contract expectations and outcomes.
 3. Compare `phoenix_test` outputs against browser outputs.
 4. Extract DOM/Form rules into explicit modules incrementally.
 5. Keep Phoenix-specific behavior isolated from generic DOM rules.
@@ -51,4 +51,3 @@ mix test test/phoenix_test/dom_oracle
 1. Full Playwright parity API.
 2. Full HTTP browser stack emulation in Elixir.
 3. Solving every `ptp` skip immediately.
-

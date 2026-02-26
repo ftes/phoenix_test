@@ -38,19 +38,37 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
     },
     %{
       id: "C004",
-      name: "form associated input included",
+      name: "form associated input submit flow",
       path: "/page/contracts/c004",
-      steps: [],
-      capture: %{"type" => "form_snapshot", "form_selector" => "#c004-form"},
-      expected: :mismatch
+      steps: [
+        %{
+          "op" => "fill_in",
+          "selector" => "#c004-name",
+          "label" => "External Name",
+          "value" => "outside-updated",
+          "exact" => true
+        },
+        %{"op" => "submit", "form_selector" => "#c004-form"}
+      ],
+      capture: %{"type" => "submit_result"},
+      expected: :match
     },
     %{
       id: "C005",
-      name: "form associated select included",
+      name: "form associated select submit flow",
       path: "/page/contracts/c005",
-      steps: [],
-      capture: %{"type" => "form_snapshot", "form_selector" => "#c005-form"},
-      expected: :mismatch
+      steps: [
+        %{
+          "op" => "select",
+          "selector" => "#c005-race",
+          "from" => "Race",
+          "option" => "Human",
+          "exact" => true
+        },
+        %{"op" => "submit", "form_selector" => "#c005-form"}
+      ],
+      capture: %{"type" => "submit_result"},
+      expected: :match
     },
     %{
       id: "C006",
@@ -90,7 +108,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
         }
       ],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c008-form-a"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C009",

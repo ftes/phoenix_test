@@ -171,7 +171,7 @@ DoD:
 ## Suggested Commit Boundaries
 
 1. `test(dom-oracle): add playwright runner and exunit wrapper`
-2. `test(dom-oracle): add P0 contract fixtures and differential tests`
+2. `test(dom-oracle): add P0 differential contract tests`
 3. `refactor(dom): add form owner module and integrate field/select/button`
 4. `refactor(dom): replace form_data heuristics with successful controls serializer`
 5. `refactor(dom): implement submitter model and action/method overrides`
@@ -187,4 +187,3 @@ cd /Users/ftes/src/phoenix_test
 mix test test/phoenix_test/dom_oracle
 mix test
 ```
-

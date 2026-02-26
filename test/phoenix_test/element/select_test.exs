@@ -111,6 +111,21 @@ defmodule PhoenixTest.Element.SelectTest do
 
       refute Select.belongs_to_form?(field, html)
     end
+
+    test "returns true if select has a form attribute that references a form" do
+      html = """
+      <form id="owner-form"></form>
+
+      <label for="name">Name</label>
+      <select id="name" form="owner-form" name="name">
+        <option value="select_1">Select 1</option>
+      </select>
+      """
+
+      field = Select.find_select_option!(html, "select", "Name", "Select 1", exact: true)
+
+      assert Select.belongs_to_form?(field, html)
+    end
   end
 
   describe "phx_click_option?" do
