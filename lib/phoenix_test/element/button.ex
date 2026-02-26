@@ -59,7 +59,7 @@ defmodule PhoenixTest.Element.Button do
   end
 
   def belongs_to_form?(%__MODULE__{} = button, html) do
-    not is_nil(button.form_id) or Form.contains_descendant?(html, button)
+    not is_nil(button.form_id) or Element.has_ancestor?(html, "form", button)
   end
 
   def submits_form?(%__MODULE__{} = button, html) do

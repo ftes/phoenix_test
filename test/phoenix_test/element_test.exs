@@ -2,6 +2,7 @@ defmodule PhoenixTest.ElementTest do
   use ExUnit.Case, async: true
 
   alias PhoenixTest.Element
+  alias PhoenixTest.Element.Field
   alias PhoenixTest.Query
 
   describe "build_selector/2" do
@@ -92,6 +93,49 @@ defmodule PhoenixTest.ElementTest do
 
       refute Element.selector_has_id?(selector, "name")
       refute Element.selector_has_id?(selector, "nome")
+    end
+  end
+
+  describe "has_ancestor?/3" do
+    test "returns true when descendant has matching ancestor" do
+      html = """
+      <form id="user-form">
+        <label>
+          Email
+          <input type="text" name="email" />
+        </label>
+      </form>
+      """
+
+      field = Field.find_input!(html, "input", "Email", exact: true)
+
+      assert Element.has_ancestor?(html, "form", field)
+    end
+
+    test "returns false when descendant has no matching ancestor" do
+      html = """
+      <div>
+        <label>
+          Email
+          <input type="text" name="email" />
+        </label>
+      </div>
+      """
+
+      field = Field.find_input!(html, "input", "Email", exact: true)
+
+      refute Element.has_ancestor?(html, "form", field)
+    end
+
+    test "accepts a {selector, text} descendant tuple" do
+      html = """
+      <form>
+        <button>Save</button>
+      </form>
+      """
+
+      assert Element.has_ancestor?(html, "form", {"button", "Save"})
+      refute Element.has_ancestor?(html, "form", {"button", "Delete"})
     end
   end
 end
