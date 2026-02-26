@@ -69,6 +69,7 @@ defmodule PhoenixTest.Element.Button do
     end
   end
 
+  def phx_click_action(%__MODULE__{} = button), do: LiveViewBindings.phx_click_action(button.parsed)
   def phx_click?(%__MODULE__{} = button), do: LiveViewBindings.phx_click?(button.parsed)
 
   def disabled?(%__MODULE__{} = button) do
