@@ -5,6 +5,9 @@ defmodule PhoenixTest.Element.Form do
   DOM serialization behavior is delegated to `PhoenixTest.DOM.FormSerializer`
   (spec-aligned rules for successful controls).
 
+  Phoenix framework conventions are delegated to
+  `PhoenixTest.PhoenixFormConventions`.
+
   Primary spec references:
 
   - WHATWG HTML: form submission algorithm
@@ -14,8 +17,8 @@ defmodule PhoenixTest.Element.Form do
 
   Phoenix-specific behavior note:
 
-  - `method` uses hidden `_method` override when present. That convention is
-    framework behavior, not browser HTML form semantics.
+  - The `method` field is resolved via `PhoenixTest.PhoenixFormConventions`,
+    including hidden `_method` override support.
   """
 
   alias PhoenixTest.DOM.FormSerializer
@@ -23,6 +26,7 @@ defmodule PhoenixTest.Element.Form do
   alias PhoenixTest.Element.Button
   alias PhoenixTest.FormData
   alias PhoenixTest.Html
+  alias PhoenixTest.PhoenixFormConventions
   alias PhoenixTest.Query
   alias PhoenixTest.Utils
 
@@ -71,7 +75,7 @@ defmodule PhoenixTest.Element.Form do
       action: action,
       form_data: FormSerializer.to_form_data(form),
       id: id,
-      method: operative_method(form),
+      method: PhoenixFormConventions.operative_method(form),
       parsed: form,
       selector: selector,
       submit_button: Button.find_first_submit(form)
@@ -125,15 +129,5 @@ defmodule PhoenixTest.Element.Form do
 
   def put_button_data(form, %Button{} = button) do
     Map.update!(form, :form_data, &FormData.add_data(&1, button))
-  end
-
-  defp operative_method(%LazyHTML{} = form) do
-    hidden_input_method_value(form) || Html.attribute(form, "method") || "get"
-  end
-
-  defp hidden_input_method_value(form) do
-    form
-    |> Html.all("input[type='hidden'][name='_method']")
-    |> Enum.find_value(&Html.attribute(&1, "value"))
   end
 end
