@@ -98,6 +98,7 @@ defmodule PhoenixTest.DOM.SuccessfulControls do
       {name, false} ->
         options = select_options(children)
         selected = Enum.filter(options, &(&1.selected? and not &1.disabled?))
+        any_selected = Enum.any?(options, & &1.selected?)
 
         if has_attribute?(attrs, "multiple") do
           Enum.map(selected, &{name, &1.value})
@@ -107,9 +108,15 @@ defmodule PhoenixTest.DOM.SuccessfulControls do
               [{name, first_selected.value}]
 
             [] ->
-              case Enum.find(options, &(!&1.disabled?)) do
-                nil -> []
-                first_option -> [{name, first_option.value}]
+              # Browser behavior keeps an explicitly selected disabled option state
+              # without falling back to the first enabled option.
+              if any_selected do
+                []
+              else
+                case Enum.find(options, &(!&1.disabled?)) do
+                  nil -> []
+                  first_option -> [{name, first_option.value}]
+                end
               end
           end
         end
