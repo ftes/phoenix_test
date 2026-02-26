@@ -1,11 +1,12 @@
 defmodule PhoenixTest.DomOracle.ContractsParityTest do
   use ExUnit.Case,
     async: false,
-    parameterize: PhoenixTest.DomOracle.ParityHelpers.parity_cases()
+    parameterize: PhoenixTest.DomOracle.ParityCore.parity_cases()
 
   import Phoenix.ConnTest
 
-  alias PhoenixTest.DomOracle.ParityHelpers
+  alias PhoenixTest.DomOracle.ParityCore
+  alias PhoenixTest.DomOracle.PhoenixAdapter
   alias PhoenixTest.OracleDiff
   alias PhoenixTest.OracleRunner
 
@@ -21,10 +22,10 @@ defmodule PhoenixTest.DomOracle.ContractsParityTest do
   end
 
   test "contract parity baseline", %{conn: conn} = contract do
-    oracle = ParityHelpers.oracle_outcome(contract)
-    ours = ParityHelpers.ours_outcome(conn, contract)
+    oracle = ParityCore.oracle_outcome(contract)
+    ours = PhoenixAdapter.ours_outcome(conn, contract)
     diff = OracleDiff.diff(oracle, ours)
 
-    ParityHelpers.assert_expected_state(contract, diff, oracle)
+    ParityCore.assert_expected_state(contract, diff, oracle)
   end
 end
