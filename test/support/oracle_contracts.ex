@@ -207,6 +207,46 @@ defmodule PhoenixTest.OracleContracts do
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c021-form"},
       expected: :match
+    },
+    %{
+      id: "C022",
+      name: "multiple select excludes disabled selected options",
+      path: "/page/contracts/c022",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c022-form"},
+      expected: :match
+    },
+    %{
+      id: "C023",
+      name: "external textarea with form attribute submits with owner form",
+      path: "/page/contracts/c023",
+      steps: [
+        %{
+          "op" => "fill_in",
+          "selector" => "#c023-notes",
+          "label" => "Notes",
+          "value" => "outside-notes",
+          "exact" => true
+        },
+        %{"op" => "submit", "form_selector" => "#c023-form"}
+      ],
+      capture: %{"type" => "submit_result"},
+      expected: :match
+    },
+    %{
+      id: "C024",
+      name: "external checkbox hidden fallback is scoped per owner form",
+      path: "/page/contracts/c024",
+      steps: [
+        %{
+          "op" => "uncheck",
+          "selector" => "#c024-subscribe-a",
+          "label" => "Subscribe A",
+          "exact" => true
+        }
+      ],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c024-form-a"},
+      expected: :match
     }
   ]
 

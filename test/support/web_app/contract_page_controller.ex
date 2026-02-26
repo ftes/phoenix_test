@@ -357,5 +357,67 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
+  def contract_html("c022") do
+    """
+    <main data-contract="c022">
+      <h1>C022</h1>
+
+      <form id="c022-form" action="/page/create_record" method="post">
+        <label for="c022-roles">Roles</label>
+        <select id="c022-roles" name="roles[]" multiple>
+          <option value="admin" selected>Admin</option>
+          <option value="editor" selected disabled>Editor</option>
+          <option value="viewer">Viewer</option>
+        </select>
+      </form>
+    </main>
+    """
+  end
+
+  def contract_html("c023") do
+    """
+    <main data-contract="c023">
+      <h1>C023</h1>
+
+      <form id="c023-form" action="/page/create_record" method="post"></form>
+
+      <label for="c023-notes">Notes</label>
+      <textarea id="c023-notes" form="c023-form" name="notes">outside-default</textarea>
+    </main>
+    """
+  end
+
+  def contract_html("c024") do
+    """
+    <main data-contract="c024">
+      <h1>C024</h1>
+
+      <form id="c024-form-a" action="/page/create_record" method="post"></form>
+      <input type="hidden" name="subscribe" form="c024-form-a" value="off_a" />
+      <label for="c024-subscribe-a">Subscribe A</label>
+      <input
+        id="c024-subscribe-a"
+        type="checkbox"
+        form="c024-form-a"
+        name="subscribe"
+        value="on_a"
+        checked
+      />
+
+      <form id="c024-form-b" action="/page/create_record" method="post"></form>
+      <input type="hidden" name="subscribe" form="c024-form-b" value="off_b" />
+      <label for="c024-subscribe-b">Subscribe B</label>
+      <input
+        id="c024-subscribe-b"
+        type="checkbox"
+        form="c024-form-b"
+        name="subscribe"
+        value="on_b"
+        checked
+      />
+    </main>
+    """
+  end
+
   def contract_html(_), do: nil
 end
