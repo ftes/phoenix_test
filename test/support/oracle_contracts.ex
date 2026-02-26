@@ -183,6 +183,30 @@ defmodule PhoenixTest.OracleContracts do
       steps: [%{"op" => "click_button", "text" => "Save", "exact" => true}],
       capture: %{"type" => "submit_result"},
       expected: :match
+    },
+    %{
+      id: "C019",
+      name: "readonly controls are successful",
+      path: "/page/contracts/c019",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c019-form"},
+      expected: :match
+    },
+    %{
+      id: "C020",
+      name: "option text is value fallback when missing value attribute",
+      path: "/page/contracts/c020",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c020-form"},
+      expected: :match
+    },
+    %{
+      id: "C021",
+      name: "disabled optgroup options are excluded from single select fallback",
+      path: "/page/contracts/c021",
+      steps: [],
+      capture: %{"type" => "form_snapshot", "form_selector" => "#c021-form"},
+      expected: :match
     }
   ]
 

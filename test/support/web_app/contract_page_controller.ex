@@ -307,5 +307,55 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
+  def contract_html("c019") do
+    """
+    <main data-contract="c019">
+      <h1>C019</h1>
+
+      <form id="c019-form" action="/page/create_record" method="post">
+        <label for="c019-readonly-name">Readonly Name</label>
+        <input id="c019-readonly-name" type="text" name="readonly_name" value="kept" readonly />
+
+        <label for="c019-editable-name">Editable Name</label>
+        <input id="c019-editable-name" type="text" name="editable_name" value="open" />
+      </form>
+    </main>
+    """
+  end
+
+  def contract_html("c020") do
+    """
+    <main data-contract="c020">
+      <h1>C020</h1>
+
+      <form id="c020-form" action="/page/create_record" method="post">
+        <label for="c020-race">Race</label>
+        <select id="c020-race" name="race">
+          <option selected>Human</option>
+          <option value="elf">Elf</option>
+        </select>
+      </form>
+    </main>
+    """
+  end
+
+  def contract_html("c021") do
+    """
+    <main data-contract="c021">
+      <h1>C021</h1>
+
+      <form id="c021-form" action="/page/create_record" method="post">
+        <label for="c021-pet">Pet</label>
+        <select id="c021-pet" name="pet">
+          <optgroup label="Disabled Group" disabled>
+            <option value="cat" selected>Cat</option>
+          </optgroup>
+          <option value="dog">Dog</option>
+        </select>
+      </form>
+    </main>
+    """
+  end
+
   def contract_html(_), do: nil
 end
