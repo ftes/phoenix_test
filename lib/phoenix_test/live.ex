@@ -5,6 +5,7 @@ defmodule PhoenixTest.Live do
   import PhoenixTest.SessionHelpers, only: [scope_selector: 2]
 
   alias PhoenixTest.ActiveForm
+  alias PhoenixTest.ActiveFormState
   alias PhoenixTest.Assertions
   alias PhoenixTest.ConnHandler
   alias PhoenixTest.DOM.ConstraintValidation
@@ -404,21 +405,7 @@ defmodule PhoenixTest.Live do
   end
 
   defp fill_in_field_data(session, field) do
-    html = session.current_operation.html
-    Field.validate_name!(field)
-
-    form = Field.parent_form!(field, html)
-
-    session =
-      Map.update!(session, :active_form, fn active_form ->
-        if active_form.selector == form.selector do
-          ActiveForm.add_form_data(active_form, field)
-        else
-          [id: form.id, selector: form.selector]
-          |> ActiveForm.new()
-          |> ActiveForm.add_form_data(field)
-        end
-      end)
+    {session, form} = ActiveFormState.put_field(session, field)
 
     maybe_trigger_phx_change(session, form, field)
   end

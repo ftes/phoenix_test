@@ -4,6 +4,7 @@ defmodule PhoenixTest.Static do
   import Phoenix.ConnTest
 
   alias PhoenixTest.ActiveForm
+  alias PhoenixTest.ActiveFormState
   alias PhoenixTest.ConnHandler
   alias PhoenixTest.DataAttributeForm
   alias PhoenixTest.DOM.ConstraintValidation
@@ -274,18 +275,8 @@ defmodule PhoenixTest.Static do
   end
 
   defp fill_in_field_data(session, field) do
-    Field.validate_name!(field)
-    form = Field.parent_form!(field, session.current_operation.html)
-
-    Map.update!(session, :active_form, fn active_form ->
-      if active_form.selector == form.selector do
-        ActiveForm.add_form_data(active_form, field)
-      else
-        [id: form.id, selector: form.selector]
-        |> ActiveForm.new()
-        |> ActiveForm.add_form_data(field)
-      end
-    end)
+    {session, _form} = ActiveFormState.put_field(session, field)
+    session
   end
 
   defp submit_active_form(session, form, submitter) do
