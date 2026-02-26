@@ -7,6 +7,7 @@ defmodule PhoenixTest.Static do
   alias PhoenixTest.ActiveFormState
   alias PhoenixTest.ConnHandler
   alias PhoenixTest.DataAttributeForm
+  alias PhoenixTest.DOM.ButtonSubmitPreflight
   alias PhoenixTest.DOM.ConstraintValidation
   alias PhoenixTest.DOM.SubmissionPlan
   alias PhoenixTest.DOM.Submitter
@@ -103,25 +104,24 @@ defmodule PhoenixTest.Static do
       Button.has_data_method?(button) ->
         click_with_data_method(session, button)
 
-      Button.belongs_to_form?(button, html) ->
-        form = Button.parent_form!(button, html)
-        form_data = SubmissionPlan.merge_active_form_data(form, active_form.selector, active_form.form_data)
-
-        if ConstraintValidation.valid_for_submit?(form, form_data, button) do
-          if active_form.selector == form.selector do
-            submit_active_form(session, form, button)
-          else
-            perform_submit(session, form, build_payload(form, ActiveForm.new(), button), button)
-          end
-        else
-          session
-        end
-
-      button.form_id ->
-        session
-
       true ->
-        Button.parent_form!(button, html)
+        case ButtonSubmitPreflight.evaluate(button, html, active_form) do
+          {:ok, %{form: form, active_form_matches?: true}} ->
+            submit_active_form(session, form, button)
+
+          {:ok, %{form: form, active_form_matches?: false}} ->
+            perform_submit(session, form, build_payload(form, ActiveForm.new(), button), button)
+
+          :invalid ->
+            session
+
+          :not_owner ->
+            if button.form_id do
+              session
+            else
+              Button.parent_form!(button, html)
+            end
+        end
     end
   end
 

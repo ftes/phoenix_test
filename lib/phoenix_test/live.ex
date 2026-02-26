@@ -8,6 +8,7 @@ defmodule PhoenixTest.Live do
   alias PhoenixTest.ActiveFormState
   alias PhoenixTest.Assertions
   alias PhoenixTest.ConnHandler
+  alias PhoenixTest.DOM.ButtonSubmitPreflight
   alias PhoenixTest.DOM.ConstraintValidation
   alias PhoenixTest.DOM.FormDataPruner
   alias PhoenixTest.DOM.SubmissionPlan
@@ -130,32 +131,33 @@ defmodule PhoenixTest.Live do
         |> render_click()
         |> maybe_redirect(session)
 
-      Button.belongs_to_form?(button, html) ->
-        active_form = session.active_form
-        form = Button.parent_form!(button, html)
-        form_data = SubmissionPlan.merge_active_form_data(form, active_form.selector, active_form.form_data)
-
-        if ConstraintValidation.valid_for_submit?(form, form_data, button) do
-          session
-          |> Map.put(:active_form, ActiveForm.new())
-          |> submit_form(form.selector, form_data, submitter: button)
-        else
-          session
-        end
-
-      Button.has_data_method?(button) ->
-        %{session.conn | resp_body: html}
-        |> PhoenixTest.Static.build()
-        |> PhoenixTest.Static.click_with_data_method(button)
-
-      button.form_id ->
-        session
-
       true ->
-        raise ArgumentError, """
-        Expected element with selector #{inspect(button.selector)} and text
-          #{inspect(button.text)} to have a valid `phx-click` attribute or belong to a `form` element.
-        """
+        case ButtonSubmitPreflight.evaluate(button, html, session.active_form) do
+          {:ok, %{form: form, form_data: form_data}} ->
+            session
+            |> Map.put(:active_form, ActiveForm.new())
+            |> submit_form(form.selector, form_data, submitter: button)
+
+          :invalid ->
+            session
+
+          :not_owner ->
+            cond do
+              Button.has_data_method?(button) ->
+                %{session.conn | resp_body: html}
+                |> PhoenixTest.Static.build()
+                |> PhoenixTest.Static.click_with_data_method(button)
+
+              button.form_id ->
+                session
+
+              true ->
+                raise ArgumentError, """
+                Expected element with selector #{inspect(button.selector)} and text
+                  #{inspect(button.text)} to have a valid `phx-click` attribute or belong to a `form` element.
+                """
+            end
+        end
     end
   end
 
