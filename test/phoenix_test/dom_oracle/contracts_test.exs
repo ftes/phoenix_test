@@ -116,7 +116,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       path: "/page/contracts/c009",
       steps: [%{"op" => "click_button", "text" => "Disabled Save", "exact" => true}],
       capture: %{"type" => "submit_result"},
-      expected: :mismatch,
+      expected: :match,
       timeout_ms: 2_000
     },
     %{
@@ -195,6 +195,11 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       expected: :mismatch
     }
   ]
+
+  defmodule StepExecutionError do
+    @moduledoc false
+    defexception [:failed_step_index, :failed_op, message: "playwright_step_failed"]
+  end
 
   setup do
     case OracleRunner.availability() do
@@ -283,6 +288,16 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
 
     %{"status" => "ok", "payload" => payload}
   rescue
+    exception in StepExecutionError ->
+      %{
+        "status" => "error",
+        "payload" => %{
+          "failed_step_index" => exception.failed_step_index,
+          "failed_op" => exception.failed_op,
+          "message" => "playwright_step_failed"
+        }
+      }
+
     exception ->
       %{
         "status" => "error",
@@ -346,22 +361,40 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
     end
   end
 
-  defp execute_steps(session, []), do: session
+  defp execute_steps(session, steps), do: execute_steps(session, steps, 0)
 
-  defp execute_steps(session, [%{"op" => "within", "mode" => "push", "selector" => selector} | rest]) do
+  defp execute_steps(session, [], _step_index), do: session
+
+  defp execute_steps(session, [%{"op" => "within", "mode" => "push", "selector" => selector} | rest], step_index) do
     {inner, after_inner} = split_within_block(rest, 1, [])
-    session = within(session, selector, &execute_steps(&1, inner))
-    execute_steps(session, after_inner)
+    session = within(session, selector, &execute_steps(&1, inner, step_index + 1))
+    execute_steps(session, after_inner, step_index + 2 + length(inner))
   end
 
-  defp execute_steps(_session, [%{"op" => "within", "mode" => "pop"} | _]) do
-    raise "Encountered unexpected within/pop while executing steps"
+  defp execute_steps(_session, [%{"op" => "within", "mode" => "pop"} | _], step_index) do
+    raise StepExecutionError,
+      failed_step_index: step_index,
+      failed_op: "within",
+      message: "Encountered unexpected within/pop while executing steps"
   end
 
-  defp execute_steps(session, [step | rest]) do
+  defp execute_steps(session, [step | rest], step_index) do
     session
-    |> execute_step(step)
-    |> execute_steps(rest)
+    |> execute_step(step, step_index)
+    |> execute_steps(rest, step_index + 1)
+  end
+
+  defp execute_step(session, step, step_index) do
+    execute_step(session, step)
+  rescue
+    exception in StepExecutionError ->
+      reraise(exception, __STACKTRACE__)
+
+    exception ->
+      raise StepExecutionError,
+        failed_step_index: step_index,
+        failed_op: step["op"],
+        message: Exception.message(exception)
   end
 
   defp execute_step(session, %{"op" => "fill_in", "label" => label, "value" => value} = step) do
@@ -411,11 +444,15 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
   end
 
   defp execute_step(_session, step) do
-    raise "Unsupported step for PhoenixTest execution: #{inspect(step)}"
+    raise StepExecutionError,
+      failed_op: step["op"] || "unknown",
+      message: "Unsupported step for PhoenixTest execution: #{inspect(step)}"
   end
 
   defp split_within_block([], _depth, _acc) do
-    raise "Missing within/pop while executing step block"
+    raise StepExecutionError,
+      failed_op: "within",
+      message: "Missing within/pop while executing step block"
   end
 
   defp split_within_block([%{"op" => "within", "mode" => "push"} = step | rest], depth, acc) do

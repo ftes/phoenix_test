@@ -91,25 +91,30 @@ defmodule PhoenixTest.Static do
     active_form = session.active_form
     html = session.current_operation.html
 
-    if Button.has_data_method?(button) do
-      click_with_data_method(session, button)
-    else
-      cond do
-        Button.belongs_to_form?(button, html) ->
-          form = Button.parent_form!(button, html)
+    cond do
+      Button.disabled?(button) ->
+        raise ArgumentError, """
+        Cannot click element with selector #{inspect(button.selector)} and text
+          #{inspect(button.text)} because it is disabled.
+        """
 
-          if active_form.selector == form.selector do
-            submit_active_form(session, form, button)
-          else
-            perform_submit(session, form, build_payload(form, ActiveForm.new(), button), button)
-          end
+      Button.has_data_method?(button) ->
+        click_with_data_method(session, button)
 
-        button.form_id ->
-          session
+      Button.belongs_to_form?(button, html) ->
+        form = Button.parent_form!(button, html)
 
-        true ->
-          Button.parent_form!(button, html)
-      end
+        if active_form.selector == form.selector do
+          submit_active_form(session, form, button)
+        else
+          perform_submit(session, form, build_payload(form, ActiveForm.new(), button), button)
+        end
+
+      button.form_id ->
+        session
+
+      true ->
+        Button.parent_form!(button, html)
     end
   end
 

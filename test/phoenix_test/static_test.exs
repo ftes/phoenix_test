@@ -219,6 +219,16 @@ defmodule PhoenixTest.StaticTest do
       |> assert_has("h1", text: "Record received")
     end
 
+    test "raises an error if button is disabled", %{conn: conn} do
+      msg = ~r/because it is disabled./
+
+      assert_raise ArgumentError, msg, fn ->
+        conn
+        |> visit("/page/contracts/c009")
+        |> click_button("Disabled Save")
+      end
+    end
+
     test "can handle redirects to a LiveView", %{conn: conn} do
       conn
       |> visit("/page/index")
