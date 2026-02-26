@@ -1,6 +1,25 @@
 Upgrade Guides
 ==============
 
+## Upcoming: DOM/Form Conformance Changes
+
+Recent DOM/form internals were aligned more closely with browser behavior.
+If your tests relied on older `phoenix_test` quirks, check the following:
+
+1. `click_button/2` now raises for disabled buttons in Static flows (matching
+   Live and browser behavior).
+2. `type="button"` controls (including those with `form=`) are not submitters.
+3. Submitter overrides (`formmethod`, `formaction`) are honored on submission.
+4. Form serialization now follows browser-style successful control rules more
+   strictly:
+   - checked checkbox/radio without `value` uses `"on"`
+   - successful text/hidden controls without explicit `value` can submit `""`
+   - disabled fieldset descendants are excluded except first legend descendants
+   - unnamed controls are excluded
+
+If assertions changed, compare against browser behavior first and then update
+test expectations where previous behavior was relying on non-browser semantics.
+
 ## Upgrading to 0.7.0
 
 Version 0.7.0 has a potentially breaking changes for those using the `upload`

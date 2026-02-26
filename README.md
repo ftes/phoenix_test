@@ -33,6 +33,16 @@ something that supports JavaScript, take a look at
 
 For full documentation, take a look at [PhoenixTest docs](https://hexdocs.pm/phoenix_test/PhoenixTest.html).
 
+## Browser-Oriented Form Semantics
+
+PhoenixTest includes browser-oracle conformance tests for DOM/form behavior.
+These tests compare `phoenix_test` behavior with Playwright/browser behavior for
+form ownership, successful controls, disabled-state rules, and submitter
+semantics.
+
+The goal is to keep Live and Static drivers aligned on DOM/form rules while
+keeping transport/event mechanics driver-specific.
+
 ## Why PhoenixTest?
 
 ### A unified way of writing feature tests

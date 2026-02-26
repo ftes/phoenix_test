@@ -1,10 +1,28 @@
 defmodule PhoenixTest.DOM.FormOwner do
-  @moduledoc false
+  @moduledoc """
+  Resolves a control's form owner.
+
+  Primary spec reference:
+
+  - WHATWG HTML: form owner concept
+    https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-owner
+
+  This module applies the same precedence as browsers:
+
+  1. Explicit `form` attribute owner (by form id).
+  2. Nearest ancestor `<form>`.
+  """
 
   alias PhoenixTest.Element
   alias PhoenixTest.Html
   alias PhoenixTest.Query
 
+  @doc """
+  Returns a selector for the control's owner form, or `nil` when no owner exists.
+
+  Spec:
+  https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-owner
+  """
   def owner_form_selector(control, html) do
     html = Html.parse_fragment(html)
 
@@ -20,6 +38,12 @@ defmodule PhoenixTest.DOM.FormOwner do
     end
   end
 
+  @doc """
+  Returns the owner `<form>` node for a control, or `nil` if no owner exists.
+
+  Spec:
+  https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-owner
+  """
   def owner_form(control, html) do
     case owner_form_selector(control, html) do
       nil -> nil

@@ -11,6 +11,22 @@ page](https://hex.pm/packages/phoenix_test)
 
 - feat: Make `assert_has/3` and `refute_has/3` accept a text string as the third argument, 
   with an optional fourth argument of keyword list options.
+- test: Add Playwright-backed DOM oracle contracts and discovery matrix for
+  form/DOM conformance.
+- refactor: Extract shared DOM/form rules into explicit modules
+  (`form_owner`, `disabled_state`, `successful_controls`, `form_serializer`,
+  `submitter`) and consume them from both Live and Static flows.
+- fix: Align form serialization with browser behavior in key areas:
+  - checked checkbox/radio without explicit `value` serialize as `"on"`
+  - successful text/hidden controls without explicit `value` serialize as `""`
+  - disabled fieldset descendants are excluded except first legend descendants
+  - unnamed controls are excluded
+- fix: Respect submitter behavior for form submission:
+  - `type="button"` controls with `form=` do not submit
+  - submitter `formmethod` and `formaction` overrides are honored
+  - only the actual submitter contributes submitter `name/value`
+- fix: Static driver now blocks disabled button clicks (parity with Live and
+  browser behavior).
 
 ## 0.9.1
 

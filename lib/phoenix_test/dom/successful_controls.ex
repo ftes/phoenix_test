@@ -1,5 +1,22 @@
 defmodule PhoenixTest.DOM.SuccessfulControls do
-  @moduledoc false
+  @moduledoc """
+  Extracts successful form-control entries from a parsed `<form>`.
+
+  Primary spec references:
+
+  - WHATWG HTML: constructing the form data set
+    https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set
+  - WHATWG HTML: form submission algorithm
+    https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-submission-algorithm
+
+  Secondary reference:
+
+  - MDN FormData
+    https://developer.mozilla.org/en-US/docs/Web/API/FormData
+
+  This module is intentionally focused on serialization semantics (successfulness,
+  disabledness, default values). It does not model transport or event mechanics.
+  """
 
   alias PhoenixTest.DOM.DisabledState
   alias PhoenixTest.Html
@@ -7,6 +24,12 @@ defmodule PhoenixTest.DOM.SuccessfulControls do
   @simple_value_types MapSet.new(~w(date datetime-local email month number password range search tel text time url week))
   @excluded_input_types MapSet.new(~w(button file image reset submit))
 
+  @doc """
+  Returns ordered `{name, value}` entries for controls that are successful.
+
+  Spec:
+  https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set
+  """
   def entries(%LazyHTML{} = form) do
     form
     |> Html.element()
