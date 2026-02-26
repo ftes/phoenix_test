@@ -121,7 +121,7 @@ defmodule PhoenixTest.Live do
           #{inspect(button.text)} because it is disabled.
         """
 
-      click_action == :dispatch_change and Button.associated_to_form?(button, html) ->
+      click_action == :dispatch_change and Button.belongs_to_form?(button, html) ->
         trigger_button_dispatch_change(session, button)
 
       click_action == :render_click ->
@@ -130,7 +130,7 @@ defmodule PhoenixTest.Live do
         |> render_click()
         |> maybe_redirect(session)
 
-      Button.belongs_to_form?(button, html) ->
+      Button.submits_form?(button, html) ->
         active_form = session.active_form
         additional_data = FormData.add_data(FormData.new(), button)
         form = Button.parent_form!(button, html)
