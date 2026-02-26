@@ -226,6 +226,18 @@ defmodule PhoenixTest.Element.FormTest do
       assert FormData.empty?(form.form_data)
     end
 
+    test "includes empty string value for successful text inputs without explicit value attribute" do
+      html = """
+      <form id="form">
+        <input type="text" name="name" />
+      </form>
+      """
+
+      form = Form.find!(html, "form")
+
+      assert FormData.has_data?(form.form_data, "name", "")
+    end
+
     test "does not include select elements that have no options or no selected options" do
       html = """
       <form id="form">

@@ -107,21 +107,13 @@ defmodule PhoenixTest.DOM.SuccessfulControls do
         end
 
       type == "hidden" ->
-        {:include, attribute(attrs, "value")}
+        {:include, attribute(attrs, "value") || ""}
 
       type in @simple_value_types ->
-        if has_attribute?(attrs, "value") do
-          {:include, attribute(attrs, "value")}
-        else
-          :ignore
-        end
+        {:include, attribute(attrs, "value") || ""}
 
       is_nil(type) ->
-        if has_attribute?(attrs, "value") do
-          {:include, attribute(attrs, "value")}
-        else
-          :ignore
-        end
+        {:include, attribute(attrs, "value") || ""}
 
       MapSet.member?(@excluded_input_types, type) ->
         :ignore
