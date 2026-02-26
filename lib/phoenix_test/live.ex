@@ -7,6 +7,7 @@ defmodule PhoenixTest.Live do
   alias PhoenixTest.ActiveForm
   alias PhoenixTest.Assertions
   alias PhoenixTest.ConnHandler
+  alias PhoenixTest.DOM.ConstraintValidation
   alias PhoenixTest.DOM.Submitter
   alias PhoenixTest.Element.Button
   alias PhoenixTest.Element.Field
@@ -138,9 +139,13 @@ defmodule PhoenixTest.Live do
             form.form_data
           end
 
-        session
-        |> Map.put(:active_form, ActiveForm.new())
-        |> submit_form(form.selector, form_data, submitter: button)
+        if ConstraintValidation.valid_for_submit?(form, form_data, button) do
+          session
+          |> Map.put(:active_form, ActiveForm.new())
+          |> submit_form(form.selector, form_data, submitter: button)
+        else
+          session
+        end
 
       Button.has_data_method?(button) ->
         %{session.conn | resp_body: html}
@@ -494,6 +499,9 @@ defmodule PhoenixTest.Live do
     additional_data = FormData.merge(Submitter.submitter_data(submitter), additional_data)
 
     cond do
+      not ConstraintValidation.valid_for_submit?(form, form_data, submitter) ->
+        session
+
       Form.phx_submit?(form) ->
         session.view
         |> form(selector, FormPayload.new(form_data))

@@ -308,7 +308,17 @@ defmodule PhoenixTest.WebApp.ContractPageController do
         <label for="c018-email">Email</label>
         <input id="c018-email" type="email" name="email" value="not-an-email" />
 
+        <label for="c018-pattern">Code</label>
+        <input id="c018-pattern" type="text" name="code" pattern="[A-Z]{3}" value="ab1" />
+
+        <label for="c018-age">Age</label>
+        <input id="c018-age" type="number" name="age" min="18" max="65" step="2" value="17" />
+
+        <label for="c018-bio">Bio</label>
+        <textarea id="c018-bio" name="bio" minlength="5" maxlength="10">bad</textarea>
+
         <button type="submit">Save</button>
+        <button type="submit" formnovalidate>Bypass Validation</button>
       </form>
     </main>
     """

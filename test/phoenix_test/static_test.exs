@@ -229,6 +229,22 @@ defmodule PhoenixTest.StaticTest do
       end
     end
 
+    test "does not submit invalid form when native constraint validation fails", %{conn: conn} do
+      conn
+      |> visit("/page/contracts/c018")
+      |> click_button("Save")
+      |> assert_has("h1", text: "C018")
+      |> refute_has("h1", text: "Record created")
+    end
+
+    test "allows submitter with formnovalidate to bypass constraint validation", %{conn: conn} do
+      conn
+      |> visit("/page/contracts/c018")
+      |> click_button("Bypass Validation")
+      |> assert_has("h1", text: "Record created")
+      |> assert_has("#form-data", text: "email: not-an-email")
+    end
+
     test "can handle redirects to a LiveView", %{conn: conn} do
       conn
       |> visit("/page/index")

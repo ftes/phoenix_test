@@ -282,6 +282,21 @@ defmodule PhoenixTest.LiveTest do
       end
     end
 
+    test "does not submit invalid form when native constraint validation fails", %{conn: conn} do
+      conn
+      |> visit("/live/index")
+      |> click_button("Save Constraint Form")
+      |> assert_has("h1", text: "LiveView main page")
+      |> refute_has("#form-data", text: "constraint_email: not-an-email")
+    end
+
+    test "allows submitter with formnovalidate to bypass constraint validation", %{conn: conn} do
+      conn
+      |> visit("/live/index")
+      |> click_button("Bypass Constraint Form")
+      |> assert_has("#form-data", text: "constraint_email: not-an-email")
+    end
+
     test "raises an error if form doesn't have a `phx-submit` or `action`", %{conn: conn} do
       msg = ~r/to have a `phx-submit` or `action` defined/
 
