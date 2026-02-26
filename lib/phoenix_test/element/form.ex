@@ -28,7 +28,7 @@ defmodule PhoenixTest.Element.Form do
 
   def find_by_descendant!(html, descendant) do
     html
-    |> Query.find_ancestor!("form", Element.descendant_selector(descendant))
+    |> Query.find_ancestor!("form", descendant)
     |> build()
   end
 

@@ -65,6 +65,6 @@ defmodule PhoenixTest.Element.Select do
   end
 
   def belongs_to_form?(field, html) do
-    Element.has_ancestor?(html, "form", field)
+    Query.has_ancestor?(html, "form", field)
   end
 end

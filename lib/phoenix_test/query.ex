@@ -325,6 +325,10 @@ defmodule PhoenixTest.Query do
     end
   end
 
+  def find_ancestor!(html, ancestor, descendant) when is_map(descendant) do
+    find_ancestor!(html, ancestor, descendant_selector(descendant))
+  end
+
   def find_ancestor!(html, ancestor, {descendant_selector, descendant_text} = desc) do
     case find_ancestor(html, ancestor, desc) do
       {:found, element} ->
@@ -413,6 +417,10 @@ defmodule PhoenixTest.Query do
     end
   end
 
+  def find_ancestor(html, ancestor_selector, descendant) when is_map(descendant) do
+    find_ancestor(html, ancestor_selector, descendant_selector(descendant))
+  end
+
   def find_ancestor(html, ancestor_selector, descendant_selector) do
     case find(html, ancestor_selector) do
       :not_found ->
@@ -425,6 +433,19 @@ defmodule PhoenixTest.Query do
         filter_ancestor_with_descendant(elements, descendant_selector)
     end
   end
+
+  def has_ancestor?(html, ancestor_selector, descendant) do
+    case find_ancestor(html, ancestor_selector, descendant_selector(descendant)) do
+      {:found, _} -> true
+      _ -> false
+    end
+  end
+
+  defp descendant_selector(selector) when is_binary(selector), do: selector
+  defp descendant_selector({selector, text}) when is_binary(selector) and is_binary(text), do: {selector, text}
+  defp descendant_selector(%{id: id}) when is_binary(id), do: "[id=#{inspect(id)}]"
+  defp descendant_selector(%{selector: selector, text: text}), do: {selector, text}
+  defp descendant_selector(%{selector: selector}), do: selector
 
   defp filter_ancestor_with_descendant(ancestors, descendant_selector, descendant_text) do
     ancestors
