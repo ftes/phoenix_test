@@ -269,6 +269,33 @@ DoD:
 2. Static/live parity tests stay green while refactors are applied.
 3. No new behavior coupling is introduced between DOM-rule modules and Phoenix transport/event specifics.
 
+## Phase 14 DOM/Phoenix Boundary Cleanup (Current)
+
+Findings:
+
+1. `Static.submit_form/4` and `Live.submit_form/4` both implement submission preflight rules (form data merge, submitter contribution, constraint validation) with partially duplicated logic.
+2. The execution backends are intentionally different and should remain separate:
+   - Static path: conn dispatch + redirect handling.
+   - Live path: `LiveViewTest` event/render flow (`phx-click`, `phx-submit`, nested view semantics).
+3. Practical split target is shared submission planning, not a fully unified driver.
+
+Plan:
+
+1. Add `lib/phoenix_test/dom/submission_plan.ex` for shared DOM-side planning helpers:
+   - merge form/default data + active-form data when owner matches,
+   - merge submitter contribution,
+   - run constraint-validation gate,
+   - expose effective method/action resolution hooks.
+2. Refactor `lib/phoenix_test/static.ex` to consume `SubmissionPlan` for preflight/decision logic while keeping HTTP dispatch local.
+3. Refactor `lib/phoenix_test/live.ex` to consume `SubmissionPlan` for preflight/decision logic while keeping LiveView event transport local.
+4. Keep behavior identical; no path-level semantic changes in this phase.
+
+DoD:
+
+1. Shared submission planning rules live in `lib/phoenix_test/dom/submission_plan.ex`.
+2. `Static` and `Live` call shared planner helpers for merge/validation/submitter logic.
+3. One full `mix test` run passes.
+
 ## Suggested Commit Boundaries
 
 1. `test(dom-oracle): add playwright runner and exunit wrapper`
