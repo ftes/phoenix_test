@@ -75,7 +75,7 @@ defmodule PhoenixTest.Element.FormTest do
     end
   end
 
-  describe "has_descendant?" do
+  describe "contains_descendant?" do
     test "returns true when descendant has form ancestor" do
       html = """
       <form id="user-form">
@@ -88,7 +88,7 @@ defmodule PhoenixTest.Element.FormTest do
 
       field = Field.find_input!(html, "input", "Email", exact: true)
 
-      assert Form.has_descendant?(html, field)
+      assert Form.contains_descendant?(html, field)
     end
 
     test "returns false when descendant has no form ancestor" do
@@ -103,7 +103,7 @@ defmodule PhoenixTest.Element.FormTest do
 
       field = Field.find_input!(html, "input", "Email", exact: true)
 
-      refute Form.has_descendant?(html, field)
+      refute Form.contains_descendant?(html, field)
     end
   end
 

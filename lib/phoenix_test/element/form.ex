@@ -32,7 +32,7 @@ defmodule PhoenixTest.Element.Form do
     |> build()
   end
 
-  def has_descendant?(html, descendant) do
+  def contains_descendant?(html, descendant) do
     case Query.find_ancestor(html, "form", descendant_selector(descendant)) do
       {:found, _} -> true
       _ -> false

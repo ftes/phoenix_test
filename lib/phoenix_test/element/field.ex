@@ -72,7 +72,7 @@ defmodule PhoenixTest.Element.Field do
   def phx_change?(field), do: LiveViewBindings.phx_change?(field.parsed)
 
   def belongs_to_form?(field, html) do
-    Form.has_descendant?(html, field)
+    Form.contains_descendant?(html, field)
   end
 
   def validate_name!(field) do
