@@ -12,6 +12,15 @@ defmodule PhoenixTest.WebApp.ContractPageController do
       "c007" -> html(conn, c007_html())
       "c008" -> html(conn, c008_html())
       "c009" -> html(conn, c009_html())
+      "c010" -> html(conn, c010_html())
+      "c011" -> html(conn, c011_html())
+      "c012" -> html(conn, c012_html())
+      "c013" -> html(conn, c013_html())
+      "c014" -> html(conn, c014_html())
+      "c015" -> html(conn, c015_html())
+      "c016" -> html(conn, c016_html())
+      "c017" -> html(conn, c017_html())
+      "c018" -> html(conn, c018_html())
       _ -> send_resp(conn, 404, "Unknown contract fixture")
     end
   end
@@ -109,7 +118,8 @@ defmodule PhoenixTest.WebApp.ContractPageController do
       <h1>C007</h1>
 
       <form id="c007-form" action="/page/create_record" method="post">
-        <input type="text" name="name" value="Aragorn" />
+        <label for="c007-name">Name</label>
+        <input id="c007-name" type="text" name="name" value="Aragorn" />
         <input type="submit" name="save" value="Save" />
       </form>
     </main>
@@ -144,6 +154,161 @@ defmodule PhoenixTest.WebApp.ContractPageController do
       <form id="c009-form" action="/page/create_record" method="post">
         <input type="text" name="name" value="Aragorn" />
         <button id="c009-disabled-submit" type="submit" disabled>Disabled Save</button>
+      </form>
+    </main>
+    """
+  end
+
+  defp c010_html do
+    """
+    <main data-contract="c010">
+      <h1>C010</h1>
+
+      <form id="c010-form" action="/page/create_record" method="post">
+        <label for="c010-contact">Contact</label>
+        <input id="c010-contact" type="radio" name="contact" checked />
+      </form>
+    </main>
+    """
+  end
+
+  defp c011_html do
+    """
+    <main data-contract="c011">
+      <h1>C011</h1>
+
+      <form id="c011-form" action="/page/create_record" method="post">
+        <input type="text" name="name" value="Aragorn" />
+        <button type="submit" name="save_a" value="a">Save A</button>
+        <button type="submit" name="save_b" value="b">Save B</button>
+      </form>
+    </main>
+    """
+  end
+
+  defp c012_html do
+    """
+    <main data-contract="c012">
+      <h1>C012</h1>
+
+      <form id="c012-form" action="/page/create_record" method="post">
+        <input type="text" name="name" value="Aragorn" />
+        <button
+          id="c012-override"
+          type="submit"
+          name="save"
+          value="override"
+          formmethod="get"
+          formaction="/page/get_record"
+        >
+          Save Override
+        </button>
+      </form>
+    </main>
+    """
+  end
+
+  defp c013_html do
+    """
+    <main data-contract="c013">
+      <h1>C013</h1>
+
+      <form id="c013-form" action="/page/create_record" method="post">
+        <label for="c013-no-name">No Name</label>
+        <input id="c013-no-name" type="text" value="ignored" />
+
+        <label for="c013-name">Name</label>
+        <input id="c013-name" type="text" name="name" value="Aragorn" />
+      </form>
+    </main>
+    """
+  end
+
+  defp c014_html do
+    """
+    <main data-contract="c014">
+      <h1>C014</h1>
+
+      <form id="c014-form" action="/page/create_record" method="post">
+        <label for="c014-race">Race</label>
+        <select id="c014-race" name="race">
+          <option value="human">Human</option>
+          <option value="elf">Elf</option>
+        </select>
+      </form>
+    </main>
+    """
+  end
+
+  defp c015_html do
+    """
+    <main data-contract="c015">
+      <h1>C015</h1>
+
+      <form id="c015-form" action="/page/create_record" method="post">
+        <label for="c015-races">Races</label>
+        <select id="c015-races" name="races[]" multiple>
+          <option value="human">Human</option>
+          <option value="elf">Elf</option>
+        </select>
+      </form>
+    </main>
+    """
+  end
+
+  defp c016_html do
+    """
+    <main data-contract="c016">
+      <h1>C016</h1>
+
+      <form id="c016-form" action="/page/create_record" method="post">
+        <label for="c016-explicit">Explicit Name</label>
+        <input id="c016-explicit" type="text" name="explicit_name" />
+
+        <label>
+          Implicit Name
+          <input id="c016-implicit" type="text" name="implicit_name" />
+        </label>
+      </form>
+    </main>
+    """
+  end
+
+  defp c017_html do
+    """
+    <main data-contract="c017">
+      <h1>C017</h1>
+
+      <form id="c017-form" action="/page/create_record" method="post">
+        <label for="c017-name">Name</label>
+        <input id="c017-name" type="text" name="name" value="Aragorn" />
+
+        <input
+          id="c017-image"
+          type="image"
+          name="img"
+          value="Image Save"
+          alt="Image Save"
+          src="/images/submit.png"
+        />
+      </form>
+    </main>
+    """
+  end
+
+  defp c018_html do
+    """
+    <main data-contract="c018">
+      <h1>C018</h1>
+
+      <form id="c018-form" action="/page/create_record" method="post">
+        <label for="c018-required">Required Name</label>
+        <input id="c018-required" type="text" name="required_name" required />
+
+        <label for="c018-email">Email</label>
+        <input id="c018-email" type="email" name="email" value="not-an-email" />
+
+        <button type="submit">Save</button>
       </form>
     </main>
     """

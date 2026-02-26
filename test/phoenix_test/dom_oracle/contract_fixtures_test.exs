@@ -19,7 +19,16 @@ defmodule PhoenixTest.DomOracle.ContractFixturesTest do
       {"/page/contracts/c006", ~w(data-contract=\"c006\" id=\"c006-form\" type=\"button\")},
       {"/page/contracts/c007", ~w(data-contract=\"c007\" id=\"c007-form\" type=\"submit\")},
       {"/page/contracts/c008", ~w(data-contract=\"c008\" id=\"c008-form-a\" id=\"c008-form-b\")},
-      {"/page/contracts/c009", ~w(data-contract=\"c009\" id=\"c009-form\" disabled)}
+      {"/page/contracts/c009", ~w(data-contract=\"c009\" id=\"c009-form\" disabled)},
+      {"/page/contracts/c010", ~w(data-contract=\"c010\" id=\"c010-form\" type=\"radio\")},
+      {"/page/contracts/c011", ~w(data-contract=\"c011\" id=\"c011-form\" name=\"save_a\")},
+      {"/page/contracts/c012", ~w(data-contract=\"c012\" id=\"c012-form\" formmethod=\"get\")},
+      {"/page/contracts/c013", ~w(data-contract=\"c013\" id=\"c013-form\" id=\"c013-no-name\")},
+      {"/page/contracts/c014", ~w(data-contract=\"c014\" id=\"c014-form\" id=\"c014-race\")},
+      {"/page/contracts/c015", ~w(data-contract=\"c015\" id=\"c015-form\" multiple)},
+      {"/page/contracts/c016", ~w(data-contract=\"c016\" id=\"c016-form\" Implicit\ Name)},
+      {"/page/contracts/c017", ~w(data-contract=\"c017\" id=\"c017-form\" type=\"image\")},
+      {"/page/contracts/c018", ~w(data-contract=\"c018\" id=\"c018-form\" required)}
     ]
 
     Enum.each(expectations, fn {path, snippets} ->
