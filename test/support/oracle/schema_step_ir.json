@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "phoenix_test/dom_oracle/step_ir_schema.json",
+  "title": "PhoenixTest DOM Oracle Step IR",
+  "type": "object",
+  "required": ["base_url", "initial_path", "steps", "capture"],
+  "properties": {
+    "base_url": { "type": "string", "minLength": 1 },
+    "initial_path": { "type": "string", "minLength": 1 },
+    "timeout_ms": { "type": "integer", "minimum": 1 },
+    "steps": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["op", "selector", "mode"],
+            "properties": {
+              "op": { "const": "within" },
+              "selector": { "type": "string" },
+              "mode": { "const": "push" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["op", "mode"],
+            "properties": {
+              "op": { "const": "within" },
+              "mode": { "const": "pop" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["op", "label", "value"],
+            "properties": {
+              "op": { "const": "fill_in" },
+              "selector": { "type": "string" },
+              "label": { "type": "string" },
+              "value": { "type": ["string", "number", "boolean"] },
+              "exact": { "type": "boolean", "default": true }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["op", "label"],
+            "properties": {
+              "op": { "enum": ["check", "uncheck", "choose"] },
+              "selector": { "type": "string" },
+              "label": { "type": "string" },
+              "exact": { "type": "boolean", "default": true }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["op", "from", "option"],
+            "properties": {
+              "op": { "const": "select" },
+              "selector": { "type": "string" },
+              "from": { "type": "string" },
+              "option": {
+                "oneOf": [
+                  { "type": "string" },
+                  {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                  }
+                ]
+              },
+              "exact": { "type": "boolean", "default": true },
+              "exact_option": { "type": "boolean", "default": true }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["op", "text"],
+            "properties": {
+              "op": { "const": "click_button" },
+              "selector": { "type": "string" },
+              "text": { "type": "string" },
+              "exact": { "type": "boolean", "default": true }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["op"],
+            "properties": {
+              "op": { "const": "submit" },
+              "form_selector": { "type": "string" },
+              "submitter_selector": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "capture": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["form_snapshot", "submit_result"] },
+        "form_selector": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
