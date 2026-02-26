@@ -1,33 +1,3 @@
-defmodule PhoenixTest.WebApp.MailingList do
-  @moduledoc false
-  use Ecto.Schema
-
-  import Ecto.Changeset
-
-  embedded_schema do
-    field(:title, :string)
-
-    embeds_many :emails, Email, on_replace: :delete do
-      field(:email, :string)
-      field(:name, :string)
-    end
-  end
-
-  def changeset(list, attrs) do
-    list
-    |> cast(attrs, [:title])
-    |> cast_embed(:emails,
-      with: &email_changeset/2,
-      sort_param: :emails_sort,
-      drop_param: :emails_drop
-    )
-  end
-
-  defp email_changeset(email, attrs) do
-    cast(email, attrs, [:email, :name])
-  end
-end
-
 defmodule PhoenixTest.WebApp.DynamicInputsAddRemoveLive do
   @moduledoc false
   use Phoenix.LiveView
@@ -37,8 +7,38 @@ defmodule PhoenixTest.WebApp.DynamicInputsAddRemoveLive do
   # https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#inputs_for/1-dynamically-adding-and-removing-inputs
   import PhoenixTest.WebApp.Components
 
+  alias __MODULE__.MailingList
   alias Phoenix.LiveView.JS
-  alias PhoenixTest.WebApp.MailingList
+
+  defmodule MailingList do
+    @moduledoc false
+    use Ecto.Schema
+
+    import Ecto.Changeset
+
+    embedded_schema do
+      field(:title, :string)
+
+      embeds_many :emails, Email, on_replace: :delete do
+        field(:email, :string)
+        field(:name, :string)
+      end
+    end
+
+    def changeset(list, attrs) do
+      list
+      |> cast(attrs, [:title])
+      |> cast_embed(:emails,
+        with: &email_changeset/2,
+        sort_param: :emails_sort,
+        drop_param: :emails_drop
+      )
+    end
+
+    defp email_changeset(email, attrs) do
+      cast(email, attrs, [:email, :name])
+    end
+  end
 
   def mount(_params, _session, socket) do
     changeset = MailingList.changeset(%MailingList{emails: [%MailingList.Email{}]}, %{})
