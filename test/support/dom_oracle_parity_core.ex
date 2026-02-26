@@ -60,7 +60,7 @@ defmodule PhoenixTest.DomOracle.ParityCore do
           "status" => "error",
           "payload" =>
             payload
-            |> Map.take(["failed_step_index", "failed_op"])
+            |> Map.take(["failed_step_index", "failed_op", "playwright_error"])
             |> Map.put("message", "playwright_step_failed")
         }
 
@@ -96,6 +96,17 @@ defmodule PhoenixTest.DomOracle.ParityCore do
       "effective_action" => capture["effective_action"],
       "entries" => normalize_entries(capture["entries"] || [])
     }
+  end
+
+  defp normalize_capture(%{"type" => "selector_text", "selector" => selector}, capture) do
+    %{
+      "selector" => selector,
+      "text" => normalize_value(capture["text"] || "")
+    }
+  end
+
+  defp normalize_capture(%{"type" => "current_path"}, capture) do
+    %{"current_path" => capture["current_path"]}
   end
 
   defp oracle_timeout_ms do

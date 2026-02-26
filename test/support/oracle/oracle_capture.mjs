@@ -110,6 +110,71 @@ async function captureSubmitResult(page, state) {
   };
 }
 
+async function captureSelectorText(page, capture) {
+  const selector = capture.selector;
+
+  if (typeof selector !== "string" || selector.length === 0) {
+    throw new Error("selector_text capture requires a non-empty selector");
+  }
+
+  const timeoutMs =
+    Number.isFinite(Number(capture.timeout_ms)) &&
+    Number(capture.timeout_ms) > 0
+      ? Number(capture.timeout_ms)
+      : 5_000;
+
+  const locator = page.locator(selector).first();
+  await locator.waitFor({ state: "attached", timeout: timeoutMs });
+
+  if (typeof capture.wait_for_text === "string") {
+    await page.waitForFunction(
+      ({ selectorValue, textValue }) => {
+        const element = document.querySelector(selectorValue);
+        if (!element) {
+          return false;
+        }
+
+        const content = element.textContent || "";
+        return content.includes(textValue);
+      },
+      { timeout: timeoutMs },
+      { selectorValue: selector, textValue: capture.wait_for_text },
+    );
+  }
+
+  const rawText = await locator.textContent();
+  const trim = capture.trim !== false;
+
+  return {
+    selector,
+    text: trim ? (rawText || "").trim() : rawText || "",
+  };
+}
+
+async function captureCurrentPath(page, capture) {
+  const timeoutMs =
+    Number.isFinite(Number(capture.timeout_ms)) &&
+    Number(capture.timeout_ms) > 0
+      ? Number(capture.timeout_ms)
+      : 5_000;
+  const waitForContains = capture.wait_for_contains;
+
+  if (typeof waitForContains === "string") {
+    await page.waitForFunction(
+      (needle) => {
+        const currentPath = `${window.location.pathname}${window.location.search}`;
+        return currentPath.includes(needle);
+      },
+      { timeout: timeoutMs },
+      waitForContains,
+    );
+  }
+
+  return page.evaluate(() => ({
+    current_path: `${window.location.pathname}${window.location.search}`,
+  }));
+}
+
 export async function captureResult(page, capture, state = {}) {
   if (capture.type === "form_snapshot") {
     return captureFormSnapshot(page, capture);
@@ -117,6 +182,14 @@ export async function captureResult(page, capture, state = {}) {
 
   if (capture.type === "submit_result") {
     return captureSubmitResult(page, state);
+  }
+
+  if (capture.type === "selector_text") {
+    return captureSelectorText(page, capture);
+  }
+
+  if (capture.type === "current_path") {
+    return captureCurrentPath(page, capture);
   }
 
   throw new Error(`Unsupported capture type: ${capture.type}`);

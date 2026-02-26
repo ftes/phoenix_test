@@ -324,6 +324,49 @@ DoD:
 2. Matrix clearly marks which high-frequency cases are currently mismatches.
 3. One full `mix test` run passes.
 
+## Phase 16 Contract Catalog Automation (Current)
+
+Findings:
+
+1. Contract metadata currently lives in `test/support/oracle_contracts.ex` while fixture HTML lives in `test/support/web_app/contract_page_controller.ex`.
+2. Adding a contract requires synchronized edits across multiple files, which increases drift risk.
+
+Plan:
+
+1. Introduce a shared catalog module that owns both contract metadata and fixture HTML.
+2. Refactor:
+   - `PhoenixTest.OracleContracts` to read contract definitions from the catalog.
+   - `ContractPageController` and `LiveContracts` to read fixture HTML from the same catalog.
+3. Keep route shape, contract IDs, expectations, and test behavior unchanged.
+
+DoD:
+
+1. A new contract is added in one place only (the catalog).
+2. `contracts_parity_test.exs` still executes the same static/live matrix.
+3. One full `mix test` run passes.
+
+## Phase 17 Live Server Parity Matrix (Current)
+
+Findings:
+
+1. Shared static/live DOM contracts validate form serialization semantics, but they do not fully cover LiveView server-side event behavior.
+2. LiveView parity needs explicit contracts for `phx-submit` event payloads and path transitions (`push_patch` / redirect outcomes).
+
+Plan:
+
+1. Add a dedicated live-only contract matrix (separate from shared static/live DOM matrix).
+2. Add live server fixtures with deterministic `handle_event` output so oracle and `phoenix_test` can compare rendered server outcomes.
+3. Extend capture types with:
+   - `selector_text` for rendered event-result assertions.
+   - `current_path` for path-transition assertions.
+4. Keep this matrix live-only; do not mirror these contracts in static suite.
+
+DoD:
+
+1. New live-only parity tests run under `test/phoenix_test/dom_oracle/live_server_parity_test.exs`.
+2. Matrix verifies live event payload/path semantics through oracle vs `phoenix_test` differential assertions.
+3. One full `mix test` run passes.
+
 ## Suggested Commit Boundaries
 
 1. `test(dom-oracle): add playwright runner and exunit wrapper`

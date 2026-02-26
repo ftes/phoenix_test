@@ -8,100 +8,132 @@ function toExact(step) {
   return step.exact !== false;
 }
 
-async function ensureSubmitObserver(page) {
-  await page.evaluate(() => {
-    if (window.__phoenixTestOracleSubmitObserverInstalled) {
-      return;
-    }
+async function waitForLiveViewConnection(page, state = {}) {
+  const timeoutMs =
+    Number.isFinite(Number(state.stepTimeoutMs)) &&
+    Number(state.stepTimeoutMs) > 0
+      ? Number(state.stepTimeoutMs)
+      : DEFAULT_TIMEOUT_MS;
 
-    const normalizeMethodInner = (methodAttr) => {
-      const value =
-        typeof methodAttr === "string" ? methodAttr.trim().toLowerCase() : "";
-      return value || "get";
-    };
+  await page.waitForFunction(
+    () => {
+      const roots = Array.from(document.querySelectorAll("[data-phx-main]"));
 
-    const normalizeActionInner = (actionAttr) => {
-      if (typeof actionAttr !== "string" || actionAttr.trim() === "") {
-        return `${window.location.pathname}${window.location.search}`;
+      if (roots.length === 0) {
+        return true;
       }
 
-      try {
-        const url = new URL(actionAttr, document.baseURI);
-        return `${url.pathname}${url.search}`;
-      } catch {
-        return actionAttr;
+      return roots.every((element) =>
+        element.classList.contains("phx-connected"),
+      );
+    },
+    { timeout: timeoutMs },
+  );
+}
+
+async function ensureSubmitObserver(page, state = {}) {
+  await page.evaluate(
+    ({ preventSubmitDefault }) => {
+      window.__phoenixTestOraclePreventSubmitDefault = preventSubmitDefault;
+
+      if (window.__phoenixTestOracleSubmitObserverInstalled) {
+        return;
       }
-    };
 
-    const serializeValueInner = (value) => {
-      if (typeof value === "string") {
-        return value;
-      }
+      const normalizeMethodInner = (methodAttr) => {
+        const value =
+          typeof methodAttr === "string" ? methodAttr.trim().toLowerCase() : "";
+        return value || "get";
+      };
 
-      if (value && typeof value === "object" && "name" in value) {
-        return value.name;
-      }
-
-      return String(value);
-    };
-
-    window.__phoenixTestOracleLastSubmit = null;
-
-    document.addEventListener(
-      "submit",
-      (event) => {
-        const form = event.target;
-
-        if (!(form instanceof HTMLFormElement)) {
-          return;
+      const normalizeActionInner = (actionAttr) => {
+        if (typeof actionAttr !== "string" || actionAttr.trim() === "") {
+          return `${window.location.pathname}${window.location.search}`;
         }
 
-        event.preventDefault();
-
-        const submitter =
-          event.submitter instanceof HTMLElement ? event.submitter : null;
-
-        let formData;
         try {
-          formData = submitter
-            ? new FormData(form, submitter)
-            : new FormData(form);
+          const url = new URL(actionAttr, document.baseURI);
+          return `${url.pathname}${url.search}`;
         } catch {
-          formData = new FormData(form);
+          return actionAttr;
+        }
+      };
+
+      const serializeValueInner = (value) => {
+        if (typeof value === "string") {
+          return value;
         }
 
-        const methodAttr =
-          submitter?.getAttribute?.("formmethod") ??
-          form.getAttribute("method");
-        const actionAttr =
-          submitter?.getAttribute?.("formaction") ??
-          form.getAttribute("action");
+        if (value && typeof value === "object" && "name" in value) {
+          return value.name;
+        }
 
-        window.__phoenixTestOracleLastSubmit = {
-          submitted: true,
-          submitter: submitter
-            ? {
-                tag: submitter.tagName.toLowerCase(),
-                type: submitter.getAttribute("type") || null,
-                name: submitter.getAttribute("name") || null,
-                value: submitter.getAttribute("value") || null,
-                id: submitter.id || null,
-              }
-            : null,
-          entries: Array.from(formData.entries()).map(([name, value]) => [
-            name,
-            serializeValueInner(value),
-          ]),
-          effective_method: normalizeMethodInner(methodAttr),
-          effective_action: normalizeActionInner(actionAttr),
-          form_selector: form.id ? `#${form.id}` : null,
-        };
-      },
-      true,
-    );
+        return String(value);
+      };
 
-    window.__phoenixTestOracleSubmitObserverInstalled = true;
-  });
+      window.__phoenixTestOracleLastSubmit = null;
+
+      document.addEventListener(
+        "submit",
+        (event) => {
+          const form = event.target;
+
+          if (!(form instanceof HTMLFormElement)) {
+            return;
+          }
+
+          if (window.__phoenixTestOraclePreventSubmitDefault) {
+            event.preventDefault();
+          }
+
+          const submitter =
+            event.submitter instanceof HTMLElement ? event.submitter : null;
+
+          let formData;
+          try {
+            formData = submitter
+              ? new FormData(form, submitter)
+              : new FormData(form);
+          } catch {
+            formData = new FormData(form);
+          }
+
+          const methodAttr =
+            submitter?.getAttribute?.("formmethod") ??
+            form.getAttribute("method");
+          const actionAttr =
+            submitter?.getAttribute?.("formaction") ??
+            form.getAttribute("action");
+
+          window.__phoenixTestOracleLastSubmit = {
+            submitted: true,
+            submitter: submitter
+              ? {
+                  tag: submitter.tagName.toLowerCase(),
+                  type: submitter.getAttribute("type") || null,
+                  name: submitter.getAttribute("name") || null,
+                  value: submitter.getAttribute("value") || null,
+                  id: submitter.id || null,
+                }
+              : null,
+            entries: Array.from(formData.entries()).map(([name, value]) => [
+              name,
+              serializeValueInner(value),
+            ]),
+            effective_method: normalizeMethodInner(methodAttr),
+            effective_action: normalizeActionInner(actionAttr),
+            form_selector: form.id ? `#${form.id}` : null,
+          };
+        },
+        true,
+      );
+
+      window.__phoenixTestOracleSubmitObserverInstalled = true;
+    },
+    {
+      preventSubmitDefault: state.preventSubmitDefault === true,
+    },
+  );
 }
 
 async function resolveLabelLocator(scope, label, exact) {
@@ -365,11 +397,13 @@ export async function runSteps(page, steps, trace, state = {}) {
   const scopeStack = [];
   const normalizedSteps = Array.isArray(steps) ? steps : [];
 
+  await waitForLiveViewConnection(page, state);
+
   for (let stepIndex = 0; stepIndex < normalizedSteps.length; stepIndex += 1) {
     const step = normalizedSteps[stepIndex];
 
     try {
-      await ensureSubmitObserver(page);
+      await ensureSubmitObserver(page, state);
       await executeStep(page, scopeStack, step, state);
 
       trace.push({
@@ -391,5 +425,5 @@ export async function runSteps(page, steps, trace, state = {}) {
     }
   }
 
-  await ensureSubmitObserver(page);
+  await ensureSubmitObserver(page, state);
 }

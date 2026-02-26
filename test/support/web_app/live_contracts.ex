@@ -1,7 +1,7 @@
 defmodule PhoenixTest.WebApp.LiveContracts do
   @moduledoc false
 
-  alias PhoenixTest.WebApp.ContractPageController
+  alias PhoenixTest.DomOracle.ContractCatalog
 
-  def html(contract), do: ContractPageController.contract_html(contract)
+  def html(contract), do: ContractCatalog.contract_html(contract)
 end

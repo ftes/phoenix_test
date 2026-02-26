@@ -5,6 +5,8 @@ defmodule PhoenixTest.DomOracle.PhoenixAdapter do
   alias PhoenixTest.Driver
   alias PhoenixTest.Element.Form
   alias PhoenixTest.FormData
+  alias PhoenixTest.Html
+  alias PhoenixTest.Query
 
   defmodule StepExecutionError do
     @moduledoc false
@@ -24,6 +26,12 @@ defmodule PhoenixTest.DomOracle.PhoenixAdapter do
 
         %{"type" => "submit_result"} ->
           ours_submit_result(session)
+
+        %{"type" => "selector_text", "selector" => selector} ->
+          ours_selector_text(session, selector)
+
+        %{"type" => "current_path"} ->
+          ours_current_path(session)
       end
 
     %{"status" => "ok", "payload" => payload}
@@ -73,6 +81,20 @@ defmodule PhoenixTest.DomOracle.PhoenixAdapter do
       "effective_action" => effective_action,
       "entries" => if(submitted, do: params_to_entries(params), else: [])
     }
+  end
+
+  defp ours_selector_text(session, selector) when is_binary(selector) do
+    html = Driver.render_html(session)
+    element = Query.find!(html, selector)
+
+    %{
+      "selector" => selector,
+      "text" => Html.element_text(element)
+    }
+  end
+
+  defp ours_current_path(session) do
+    %{"current_path" => Map.get(session, :current_path)}
   end
 
   defp submitted_params(conn) do

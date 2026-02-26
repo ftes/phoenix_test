@@ -107,6 +107,20 @@ async function main() {
     browser = await chromium.launch({ headless: true });
     context = await browser.newContext();
     page = await context.newPage();
+    page.on("console", (message) => {
+      trace.push({
+        type: "console",
+        level: message.type(),
+        text: message.text(),
+      });
+    });
+    page.on("pageerror", (error) => {
+      trace.push({
+        type: "pageerror",
+        message: error?.message ?? String(error),
+      });
+    });
+
     const timeoutMs = resolveTimeoutMs(spec);
     page.setDefaultTimeout(timeoutMs);
     page.setDefaultNavigationTimeout(timeoutMs);
@@ -116,6 +130,11 @@ async function main() {
       waitUntil: "domcontentloaded",
       timeout: timeoutMs,
     });
+
+    state.preventSubmitDefault =
+      spec?.prevent_submit_default === true ||
+      spec?.capture?.type === "submit_result";
+    state.stepTimeoutMs = timeoutMs;
 
     await runSteps(page, spec.steps, trace, state);
     const capture = await captureResult(page, spec.capture, state);
