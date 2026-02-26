@@ -1,4 +1,4 @@
-defmodule PhoenixTest.DomOracle.ContractsTest do
+defmodule PhoenixTest.DomOracle.ContractsLiveParityTest do
   use ExUnit.Case, async: false
 
   import Phoenix.ConnTest
@@ -12,7 +12,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
   alias PhoenixTest.OracleNormalize
   alias PhoenixTest.OracleRunner
 
-  @contracts OracleContracts.for_surface(:static)
+  @contracts OracleContracts.for_surface(:live)
 
   defmodule StepExecutionError do
     @moduledoc false

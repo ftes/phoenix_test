@@ -152,6 +152,9 @@ defmodule PhoenixTest.Live do
         |> PhoenixTest.Static.build()
         |> PhoenixTest.Static.click_with_data_method(button)
 
+      button.form_id ->
+        session
+
       true ->
         raise ArgumentError, """
         Expected element with selector #{inspect(button.selector)} and text
@@ -493,7 +496,7 @@ defmodule PhoenixTest.Live do
     additional_data = Keyword.get(opts, :additional_data, FormData.new())
     form = Form.find!(session.current_operation.html, selector)
 
-    form_data = remove_data_for_fields_that_have_been_removed(form_data, form)
+    form_data = remove_data_for_fields_that_have_been_removed(form_data, form, session.current_operation.html)
     form_data = FormData.merge(form.form_data, form_data)
 
     additional_data = FormData.merge(Submitter.submitter_data(submitter), additional_data)
@@ -519,12 +522,25 @@ defmodule PhoenixTest.Live do
     end
   end
 
-  defp remove_data_for_fields_that_have_been_removed(form_data, form) do
+  defp remove_data_for_fields_that_have_been_removed(form_data, form, html) do
     element_names = Form.form_element_names(form)
+    associated_names = associated_form_element_names(form, html)
+    valid_names = MapSet.new(element_names ++ associated_names)
 
     FormData.filter(form_data, fn %{name: name} ->
-      name in element_names
+      MapSet.member?(valid_names, name)
     end)
+  end
+
+  defp associated_form_element_names(%Form{id: nil}, _html), do: []
+
+  defp associated_form_element_names(%Form{id: form_id}, html) do
+    html
+    |> Html.parse_fragment()
+    |> Html.all(~s([name][form="#{form_id}"]))
+    |> Enum.map(&Html.attribute(&1, "name"))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
   end
 
   def open_browser(%{view: view} = session, open_fun \\ &Phoenix.LiveViewTest.open_browser/1) do

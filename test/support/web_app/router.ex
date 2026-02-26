@@ -43,6 +43,7 @@ defmodule PhoenixTest.WebApp.Router do
       live "/live/async_page_2", AsyncPage2Live
       live "/live/dynamic_form", DynamicFormLive
       live "/live/simple_ordinal_inputs", SimpleOrdinalInputsLive
+      live "/live/contracts/:contract", ContractLive
       live "/live/nested", NestedLive
     end
 

@@ -2,30 +2,13 @@ defmodule PhoenixTest.WebApp.ContractPageController do
   use Phoenix.Controller, formats: [html: "View"]
 
   def show(conn, %{"contract" => contract}) do
-    case contract do
-      "c001" -> html(conn, c001_html())
-      "c002" -> html(conn, c002_html())
-      "c003" -> html(conn, c003_html())
-      "c004" -> html(conn, c004_html())
-      "c005" -> html(conn, c005_html())
-      "c006" -> html(conn, c006_html())
-      "c007" -> html(conn, c007_html())
-      "c008" -> html(conn, c008_html())
-      "c009" -> html(conn, c009_html())
-      "c010" -> html(conn, c010_html())
-      "c011" -> html(conn, c011_html())
-      "c012" -> html(conn, c012_html())
-      "c013" -> html(conn, c013_html())
-      "c014" -> html(conn, c014_html())
-      "c015" -> html(conn, c015_html())
-      "c016" -> html(conn, c016_html())
-      "c017" -> html(conn, c017_html())
-      "c018" -> html(conn, c018_html())
-      _ -> send_resp(conn, 404, "Unknown contract fixture")
+    case contract_html(contract) do
+      nil -> send_resp(conn, 404, "Unknown contract fixture")
+      html_content -> html(conn, html_content)
     end
   end
 
-  defp c001_html do
+  def contract_html("c001") do
     """
     <main data-contract="c001">
       <h1>C001</h1>
@@ -38,7 +21,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c002_html do
+  def contract_html("c002") do
     """
     <main data-contract="c002">
       <h1>C002</h1>
@@ -51,7 +34,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c003_html do
+  def contract_html("c003") do
     """
     <main data-contract="c003">
       <h1>C003</h1>
@@ -71,7 +54,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c004_html do
+  def contract_html("c004") do
     """
     <main data-contract="c004">
       <h1>C004</h1>
@@ -83,7 +66,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c005_html do
+  def contract_html("c005") do
     """
     <main data-contract="c005">
       <h1>C005</h1>
@@ -98,7 +81,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c006_html do
+  def contract_html("c006") do
     """
     <main data-contract="c006">
       <h1>C006</h1>
@@ -112,7 +95,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c007_html do
+  def contract_html("c007") do
     """
     <main data-contract="c007">
       <h1>C007</h1>
@@ -126,7 +109,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c008_html do
+  def contract_html("c008") do
     """
     <main data-contract="c008">
       <h1>C008</h1>
@@ -146,7 +129,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c009_html do
+  def contract_html("c009") do
     """
     <main data-contract="c009">
       <h1>C009</h1>
@@ -159,7 +142,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c010_html do
+  def contract_html("c010") do
     """
     <main data-contract="c010">
       <h1>C010</h1>
@@ -172,7 +155,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c011_html do
+  def contract_html("c011") do
     """
     <main data-contract="c011">
       <h1>C011</h1>
@@ -186,7 +169,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c012_html do
+  def contract_html("c012") do
     """
     <main data-contract="c012">
       <h1>C012</h1>
@@ -208,7 +191,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c013_html do
+  def contract_html("c013") do
     """
     <main data-contract="c013">
       <h1>C013</h1>
@@ -224,7 +207,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c014_html do
+  def contract_html("c014") do
     """
     <main data-contract="c014">
       <h1>C014</h1>
@@ -240,7 +223,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c015_html do
+  def contract_html("c015") do
     """
     <main data-contract="c015">
       <h1>C015</h1>
@@ -256,7 +239,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c016_html do
+  def contract_html("c016") do
     """
     <main data-contract="c016">
       <h1>C016</h1>
@@ -274,7 +257,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c017_html do
+  def contract_html("c017") do
     """
     <main data-contract="c017">
       <h1>C017</h1>
@@ -296,7 +279,7 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     """
   end
 
-  defp c018_html do
+  def contract_html("c018") do
     """
     <main data-contract="c018">
       <h1>C018</h1>
@@ -323,4 +306,6 @@ defmodule PhoenixTest.WebApp.ContractPageController do
     </main>
     """
   end
+
+  def contract_html(_), do: nil
 end

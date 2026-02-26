@@ -34,9 +34,12 @@ defmodule PhoenixTest.OracleRunner do
   def base_url do
     endpoint = Application.fetch_env!(:phoenix_test, :endpoint)
     endpoint_config = Application.fetch_env!(:phoenix_test, endpoint)
+    url_config = endpoint_config[:url] || []
     http_config = endpoint_config[:http] || []
-    port = Keyword.get(http_config, :port, 4000)
-    "http://127.0.0.1:#{port}"
+    scheme = Keyword.get(url_config, :scheme, "http")
+    host = Keyword.get(url_config, :host, "localhost")
+    port = Keyword.get(url_config, :port, Keyword.get(http_config, :port, 4000))
+    "#{scheme}://#{host}:#{port}"
   end
 
   def available?, do: availability() == :ok
