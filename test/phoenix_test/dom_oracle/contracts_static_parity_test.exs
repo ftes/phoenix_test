@@ -1,4 +1,4 @@
-defmodule PhoenixTest.DomOracle.ContractsTest do
+defmodule PhoenixTest.DomOracle.ContractsStaticParityTest do
   use ExUnit.Case, async: false
 
   import Phoenix.ConnTest

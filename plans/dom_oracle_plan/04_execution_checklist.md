@@ -76,9 +76,8 @@ DoD:
 
 Create files:
 
-1. `test/phoenix_test/dom_oracle/contracts_test.exs`
+1. `test/phoenix_test/dom_oracle/contracts_static_parity_test.exs`
 2. `test/phoenix_test/dom_oracle/contracts_live_parity_test.exs`
-3. Optional: `test/phoenix_test/dom_oracle/contracts_static_parity_test.exs`
 
 Test pattern:
 
@@ -148,7 +147,7 @@ DoD:
 
 Create files:
 
-1. `test/phoenix_test/dom_oracle/discovery_test.exs` (or extend `contracts_test.exs`).
+1. `test/phoenix_test/dom_oracle/discovery_test.exs` (or extend `contracts_static_parity_test.exs`).
 
 Work items:
 
@@ -219,7 +218,7 @@ Create files:
 Update files:
 
 1. `test/support/web_app/router.ex` add `/live/contracts/:contract` route.
-2. `test/phoenix_test/dom_oracle/contracts_test.exs` extract/share contract matrix if needed.
+2. `test/phoenix_test/dom_oracle/contracts_static_parity_test.exs` extract/share contract matrix if needed.
 
 Work items:
 
@@ -234,6 +233,27 @@ DoD:
 1. `mix test test/phoenix_test/dom_oracle/contracts_live_parity_test.exs` passes.
 2. `mix test test/phoenix_test/dom_oracle` passes with both static and live parity suites enabled.
 3. For each non-ignored contract, static and live suites have aligned expected states (`:match` or `:mismatch`).
+
+## Phase 12 Spec Matrix Expansion
+
+Work items:
+
+1. Add new browser-spec contracts (`C019+`) to broaden HTML form coverage (readonly controls, option text fallback, disabled optgroup behavior, and other edge cases).
+2. Define each new contract once in shared matrix data and execute against both static and live fixture surfaces.
+3. Keep fixtures deterministic and minimal so diffs point to one rule per contract.
+4. When a new contract uncovers divergence, either:
+   - fix behavior to match the oracle and mark `:match`, or
+   - track as explicit `:mismatch`/`:ignore` with rationale.
+
+DoD:
+
+1. Added contracts execute in both `contracts_static_parity_test.exs` and `contracts_live_parity_test.exs`.
+2. `mix test test/phoenix_test/dom_oracle/contracts_static_parity_test.exs` passes.
+3. `mix test test/phoenix_test/dom_oracle/contracts_live_parity_test.exs` passes.
+
+Execution note:
+
+1. Do not run multiple `mix test ...` commands in parallel in this project; test endpoint uses a fixed port (`4000`) and parallel runs will conflict.
 
 ## Suggested Commit Boundaries
 
