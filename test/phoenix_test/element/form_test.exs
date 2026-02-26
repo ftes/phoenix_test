@@ -222,6 +222,24 @@ defmodule PhoenixTest.Element.FormTest do
       assert FormData.empty?(form.form_data)
     end
 
+    test "single select default skips disabled options and disabled optgroups" do
+      html = """
+      <form id="form">
+        <select name="pet">
+          <optgroup label="Disabled group" disabled>
+            <option value="cat">Cat</option>
+          </optgroup>
+          <option value="dog">Dog</option>
+        </select>
+      </form>
+      """
+
+      form = Form.find!(html, "form")
+
+      assert FormData.has_data?(form.form_data, "pet", "dog")
+      refute FormData.has_data?(form.form_data, "pet", "cat")
+    end
+
     test "includes hidden inputs" do
       html = """
       <form id="form">
