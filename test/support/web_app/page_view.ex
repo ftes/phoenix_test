@@ -369,6 +369,18 @@ defmodule PhoenixTest.WebApp.PageView do
     """
   end
 
+  def render("disabled_submit_button.html", assigns) do
+    ~H"""
+    <h1>Disabled submit button page</h1>
+
+    <form action="/page/create_record" method="post">
+      <label for="disabled-submit-name">Name</label>
+      <input id="disabled-submit-name" type="text" name="name" value="Aragorn" />
+      <button type="submit" disabled>Disabled Save</button>
+    </form>
+    """
+  end
+
   def render("page_3.html", assigns) do
     ~H"""
     <h1>Page 3</h1>

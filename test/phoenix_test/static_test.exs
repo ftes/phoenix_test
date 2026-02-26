@@ -307,6 +307,16 @@ defmodule PhoenixTest.StaticTest do
         |> click_button("Actionless Button")
       end
     end
+
+    test "raises an error if trying to click a disabled submit button", %{conn: conn} do
+      msg = ~r/because it is disabled./
+
+      assert_raise ArgumentError, msg, fn ->
+        conn
+        |> visit("/page/disabled_submit_button")
+        |> click_button("Disabled Save")
+      end
+    end
   end
 
   describe "within/3" do
