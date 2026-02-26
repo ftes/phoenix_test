@@ -6,8 +6,6 @@ defmodule PhoenixTest.LiveViewBindings do
 
   @type phx_click_action :: :render_click | :dispatch_change | :none
 
-  # See LiveView docs for `JS.dispatch("change")` in dynamic `inputs_for` controls:
-  # https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#inputs_for/1-dynamically-adding-and-removing-inputs
   @spec phx_click_action(LazyHTML.t()) :: phx_click_action()
   def phx_click_action(parsed_element) do
     parsed_element
