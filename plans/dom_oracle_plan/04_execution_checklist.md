@@ -76,8 +76,7 @@ DoD:
 
 Create files:
 
-1. `test/phoenix_test/dom_oracle/contracts_static_parity_test.exs`
-2. `test/phoenix_test/dom_oracle/contracts_live_parity_test.exs`
+1. `test/phoenix_test/dom_oracle/contracts_parity_test.exs`
 
 Test pattern:
 
@@ -147,7 +146,7 @@ DoD:
 
 Create files:
 
-1. `test/phoenix_test/dom_oracle/discovery_test.exs` (or extend `contracts_static_parity_test.exs`).
+1. `test/phoenix_test/dom_oracle/discovery_test.exs` (or extend `contracts_parity_test.exs`).
 
 Work items:
 
@@ -213,12 +212,11 @@ Create files:
 
 1. `test/support/web_app/live_contracts.ex`
 2. `test/support/web_app/contract_live.ex`
-3. `test/phoenix_test/dom_oracle/contracts_live_parity_test.exs`
 
 Update files:
 
 1. `test/support/web_app/router.ex` add `/live/contracts/:contract` route.
-2. `test/phoenix_test/dom_oracle/contracts_static_parity_test.exs` extract/share contract matrix if needed.
+2. `test/phoenix_test/dom_oracle/contracts_parity_test.exs` execute shared matrix for both `:static` and `:live` surfaces.
 
 Work items:
 
@@ -230,8 +228,8 @@ Work items:
 
 DoD:
 
-1. `mix test test/phoenix_test/dom_oracle/contracts_live_parity_test.exs` passes.
-2. `mix test test/phoenix_test/dom_oracle` passes with both static and live parity suites enabled.
+1. `mix test test/phoenix_test/dom_oracle/contracts_parity_test.exs` passes for all surfaces.
+2. `mix test test/phoenix_test/dom_oracle` passes with both static and live parity cases enabled.
 3. For each non-ignored contract, static and live suites have aligned expected states (`:match` or `:mismatch`).
 
 ## Phase 12 Spec Matrix Expansion
@@ -247,13 +245,14 @@ Work items:
 
 DoD:
 
-1. Added contracts execute in both `contracts_static_parity_test.exs` and `contracts_live_parity_test.exs`.
-2. `mix test test/phoenix_test/dom_oracle/contracts_static_parity_test.exs` passes.
-3. `mix test test/phoenix_test/dom_oracle/contracts_live_parity_test.exs` passes.
+1. Added contracts execute in `contracts_parity_test.exs` for both `:static` and `:live`.
+2. `mix test test/phoenix_test/dom_oracle/contracts_parity_test.exs` passes.
+3. `mix test test/phoenix_test/dom_oracle` passes.
 
 Execution note:
 
 1. Do not run multiple `mix test ...` commands in parallel in this project; test endpoint uses a fixed port (`4000`) and parallel runs will conflict.
+2. Prefer a single full-suite invocation (`mix test`) instead of multiple scoped invocations; otherwise expensive parity tests run repeatedly and slow down feedback.
 
 ## Phase 13 Priority Order (Current)
 
@@ -289,6 +288,5 @@ Run:
 
 ```bash
 cd /Users/ftes/src/phoenix_test
-mix test test/phoenix_test/dom_oracle
 mix test
 ```

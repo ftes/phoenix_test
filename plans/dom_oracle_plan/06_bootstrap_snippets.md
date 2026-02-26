@@ -68,10 +68,10 @@ end
 
 ## Differential Test Skeleton
 
-Path: `test/phoenix_test/dom_oracle/contracts_static_parity_test.exs`
+Path: `test/phoenix_test/dom_oracle/contracts_parity_test.exs`
 
 ```elixir
-defmodule PhoenixTest.DomOracle.ContractsStaticParityTest do
+defmodule PhoenixTest.DomOracle.ContractsParityTest do
   use PhoenixTest.ConnCase, async: true
 
   test "C002 checkbox default on", %{conn: conn} do
@@ -108,8 +108,5 @@ Use prefix in tests and commit titles:
 
 ```bash
 cd /Users/ftes/src/phoenix_test
-mix test test/phoenix_test/dom_oracle/contracts_static_parity_test.exs
-mix test test/phoenix_test/element/form_test.exs
 mix test
 ```
-
