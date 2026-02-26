@@ -18,7 +18,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       path: "/page/contracts/c001",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c001-form"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C002",
@@ -26,7 +26,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       path: "/page/contracts/c002",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c002-form"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C003",
@@ -34,7 +34,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       path: "/page/contracts/c003",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c003-form"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C004",
@@ -125,7 +125,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       path: "/page/contracts/c010",
       steps: [],
       capture: %{"type" => "form_snapshot", "form_selector" => "#c010-form"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C011",

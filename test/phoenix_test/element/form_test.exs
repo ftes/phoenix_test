@@ -178,6 +178,7 @@ defmodule PhoenixTest.Element.FormTest do
     test "does not include disabled inputs in form_data" do
       html = """
       <form id="form">
+        <input type="hidden" name="token" value="abc" disabled />
         <input name="input" value="value" disabled />
         <input name="checkbox" type="checkbox" value="checked" checked disabled />
         <input name="radio" type="radio" value="checked" checked disabled />
@@ -187,7 +188,28 @@ defmodule PhoenixTest.Element.FormTest do
 
       form = Form.find!(html, "form")
 
+      refute FormData.has_data?(form.form_data, "token", "abc")
       refute FormData.has_data?(form.form_data, "input", "value")
+    end
+
+    test "does not include controls disabled by a fieldset except first legend descendants" do
+      html = """
+      <form id="form">
+        <fieldset disabled>
+          <legend>
+            Legend
+            <input type="text" name="legend_allowed" value="yes" />
+          </legend>
+
+          <input type="text" name="fieldset_blocked" value="no" />
+        </fieldset>
+      </form>
+      """
+
+      form = Form.find!(html, "form")
+
+      assert FormData.has_data?(form.form_data, "legend_allowed", "yes")
+      refute FormData.has_data?(form.form_data, "fieldset_blocked", "no")
     end
 
     test "does not include inputs without a `name` attribute" do
@@ -244,6 +266,20 @@ defmodule PhoenixTest.Element.FormTest do
       form = Form.find!(html, "form")
 
       assert FormData.has_data?(form.form_data, "checkbox", "checked")
+    end
+
+    test "defaults checked checkbox and radio values to on when value is absent" do
+      html = """
+      <form id="form">
+        <input name="checkbox" type="checkbox" checked />
+        <input name="radio" type="radio" checked />
+      </form>
+      """
+
+      form = Form.find!(html, "form")
+
+      assert FormData.has_data?(form.form_data, "checkbox", "on")
+      assert FormData.has_data?(form.form_data, "radio", "on")
     end
   end
 

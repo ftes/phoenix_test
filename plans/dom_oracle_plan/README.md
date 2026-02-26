@@ -50,4 +50,4 @@ mix test test/phoenix_test/dom_oracle
 
 1. Full Playwright parity API.
 2. Full HTTP browser stack emulation in Elixir.
-3. Solving every `ptp` skip immediately.
+3. Solving every `phoenix_test_playwright` skip immediately.

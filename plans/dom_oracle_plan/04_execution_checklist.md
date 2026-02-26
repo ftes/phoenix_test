@@ -144,7 +144,24 @@ DoD:
 
 1. `C006`, `C007`, `C011`, `C012` pass.
 
-## Phase 7 Driver Parity Cleanup
+## Phase 7 Systematic Divergence Discovery
+
+Create files:
+
+1. `test/phoenix_test/dom_oracle/discovery_test.exs` (or extend `contracts_test.exs`).
+
+Work items:
+
+1. Add targeted matrix cases per control type/attribute combination (disabled ancestry, defaults, submitter attrs).
+2. Add one lightweight generator/property sweep for DOM permutations where deterministic.
+3. Capture each newly found mismatch with a stable contract ID and fixture route.
+
+DoD:
+
+1. New mismatches are discovered by test generation, not ad-hoc guessing.
+2. Every discovered mismatch is either tracked as a contract or fixed.
+
+## Phase 8 Driver Parity Cleanup
 
 Update files:
 
@@ -156,7 +173,7 @@ DoD:
 1. `C009` passes.
 2. No regressions in existing driver tests.
 
-## Phase 8 Documentation And Changelog
+## Phase 9 Documentation And Changelog
 
 Update files:
 
@@ -176,7 +193,8 @@ DoD:
 4. `refactor(dom): replace form_data heuristics with successful controls serializer`
 5. `refactor(dom): implement submitter model and action/method overrides`
 6. `fix(static): align disabled button behavior with live driver`
-7. `docs: add conformance notes and upgrade guide`
+7. `test(dom-oracle): add systematic divergence discovery matrix`
+8. `docs: add conformance notes and upgrade guide`
 
 ## Minimal Acceptance Gate
 

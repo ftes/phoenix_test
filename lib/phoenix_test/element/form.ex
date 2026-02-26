@@ -1,6 +1,7 @@
 defmodule PhoenixTest.Element.Form do
   @moduledoc false
 
+  alias PhoenixTest.DOM.FormSerializer
   alias PhoenixTest.Element
   alias PhoenixTest.Element.Button
   alias PhoenixTest.FormData
@@ -39,7 +40,7 @@ defmodule PhoenixTest.Element.Form do
 
     %__MODULE__{
       action: action,
-      form_data: form_data(form),
+      form_data: FormSerializer.to_form_data(form),
       id: id,
       method: operative_method(form),
       parsed: form,
@@ -73,100 +74,10 @@ defmodule PhoenixTest.Element.Form do
   defp descendant_selector(%{selector: selector, text: text}), do: {selector, text}
   defp descendant_selector(%{selector: selector}), do: selector
 
-  @simple_value_types ~w(
-    date
-    datetime-local
-    email
-    month
-    number
-    password
-    range
-    search
-    tel
-    text
-    time
-    url
-    week
-  )
-
-  @hidden_inputs "input[type='hidden']"
-  @checked_radio_buttons "input:not([disabled])[type='radio'][value]:checked"
-  @checked_checkboxes "input:not([disabled])[type='checkbox'][value]:checked"
-  @pre_filled_default_text_inputs "input:not([disabled]):not([type])[value]"
-
-  @pre_filled_simple_value_inputs Enum.map_join(
-                                    @simple_value_types,
-                                    ",",
-                                    &"input:not([disabled])[type='#{&1}'][value]"
-                                  )
-
-  defp form_data(form) do
-    FormData.new()
-    |> FormData.add_data(form_data(@hidden_inputs, form))
-    |> FormData.add_data(form_data(@checked_radio_buttons, form))
-    |> FormData.add_data(form_data(@checked_checkboxes, form))
-    |> FormData.add_data(form_data(@pre_filled_simple_value_inputs, form))
-    |> FormData.add_data(form_data(@pre_filled_default_text_inputs, form))
-    |> FormData.add_data(form_data_textarea(form))
-    |> FormData.add_data(form_data_select(form))
-  end
-
-  defp form_data(selector, form) do
-    form
-    |> Html.all(selector)
-    |> Enum.map(&to_form_field/1)
-  end
-
-  defp form_data_textarea(form) do
-    form
-    |> Html.all("textarea:not([disabled])")
-    |> Enum.map(&to_form_field/1)
-  end
-
-  defp form_data_select(form) do
-    form
-    |> Html.all("select:not([disabled])")
-    |> Enum.flat_map(fn select ->
-      selected_options = Html.all(select, "option[selected]")
-      multiple? = Html.attribute(select, "multiple") != nil
-
-      case {multiple?, Enum.count(selected_options)} do
-        {true, 0} ->
-          []
-
-        {false, 0} ->
-          if option = select |> Html.all("option") |> Enum.at(0) do
-            [to_form_field(select, option)]
-          else
-            []
-          end
-
-        {false, _} ->
-          [to_form_field(select, selected_options)]
-
-        _ ->
-          Enum.map(selected_options, &to_form_field(select, &1))
-      end
-    end)
-  end
-
   def put_button_data(form, nil), do: form
 
   def put_button_data(form, %Button{} = button) do
     Map.update!(form, :form_data, &FormData.add_data(&1, button))
-  end
-
-  defp to_form_field(element) do
-    to_form_field(element, element)
-  end
-
-  defp to_form_field(name_element, value_element) do
-    name = Html.attribute(name_element, "name")
-    {name, element_value(value_element)}
-  end
-
-  defp element_value(element) do
-    Html.attribute(element, "value") || Html.element_text(element)
   end
 
   defp operative_method(%LazyHTML{} = form) do

@@ -50,6 +50,7 @@ defmodule PhoenixTest.FormPayloadTest do
                "number-input" => "123",
                "select" => "selected",
                "select_multiple" => ["select_1", "select_2"],
+               "select_none_selected" => "first",
                "checkbox" => "checked",
                "radio" => "checked",
                "textarea" => "Default text"
