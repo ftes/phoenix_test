@@ -204,6 +204,21 @@ defmodule PhoenixTest.StaticTest do
       |> assert_has("#form-data", text: "name: Aragorn")
     end
 
+    test "does not submit when clicking type=button with form owner", %{conn: conn} do
+      conn
+      |> visit("/page/contracts/c006")
+      |> click_button("External Action")
+      |> assert_has("h1", text: "C006")
+      |> refute_has("h1", text: "Record created")
+    end
+
+    test "respects submitter formmethod and formaction overrides", %{conn: conn} do
+      conn
+      |> visit("/page/contracts/c012")
+      |> click_button("Save Override")
+      |> assert_has("h1", text: "Record received")
+    end
+
     test "can handle redirects to a LiveView", %{conn: conn} do
       conn
       |> visit("/page/index")

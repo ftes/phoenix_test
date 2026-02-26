@@ -6,6 +6,7 @@ defmodule PhoenixTest.Static do
   alias PhoenixTest.ActiveForm
   alias PhoenixTest.ConnHandler
   alias PhoenixTest.DataAttributeForm
+  alias PhoenixTest.DOM.Submitter
   alias PhoenixTest.Element.Button
   alias PhoenixTest.Element.Field
   alias PhoenixTest.Element.Form
@@ -93,15 +94,21 @@ defmodule PhoenixTest.Static do
     if Button.has_data_method?(button) do
       click_with_data_method(session, button)
     else
-      form =
-        button
-        |> Button.parent_form!(html)
-        |> Form.put_button_data(button)
+      cond do
+        Button.belongs_to_form?(button, html) ->
+          form = Button.parent_form!(button, html)
 
-      if active_form.selector == form.selector do
-        submit_active_form(session, form)
-      else
-        perform_submit(session, form, build_payload(form))
+          if active_form.selector == form.selector do
+            submit_active_form(session, form, button)
+          else
+            perform_submit(session, form, build_payload(form, ActiveForm.new(), button), button)
+          end
+
+        button.form_id ->
+          session
+
+        true ->
+          Button.parent_form!(button, html)
       end
     end
   end
@@ -211,31 +218,20 @@ defmodule PhoenixTest.Static do
     selector = active_form.selector
     session = set_operation(session, :submit)
 
-    form =
-      session.current_operation.html
-      |> Form.find!(selector)
-      |> then(fn form ->
-        Form.put_button_data(form, form.submit_button)
-      end)
+    form = Form.find!(session.current_operation.html, selector)
 
-    submit_active_form(session, form)
+    submit_active_form(session, form, form.submit_button)
   end
 
-  def submit_form(session, selector, form_data) do
+  def submit_form(session, selector, form_data, submitter \\ nil) do
     session = set_operation!(session, :submit_form)
 
-    form =
-      session.current_operation.html
-      |> Form.find!(selector)
-      |> then(fn form ->
-        Form.put_button_data(form, form.submit_button)
-      end)
-
-    to_submit = FormPayload.new(FormData.merge(form.form_data, form_data))
+    form = Form.find!(session.current_operation.html, selector)
+    to_submit = build_payload(form, ActiveForm.new(form_data: form_data), submitter)
 
     session
     |> Map.put(:active_form, ActiveForm.new())
-    |> perform_submit(form, to_submit)
+    |> perform_submit(form, to_submit, submitter)
   end
 
   def open_browser(session, open_fun \\ &OpenBrowser.open_with_system_cmd/1) do
@@ -275,20 +271,25 @@ defmodule PhoenixTest.Static do
     end)
   end
 
-  defp submit_active_form(session, form) do
+  defp submit_active_form(session, form, submitter) do
     active_form = session.active_form
 
     session
     |> Map.put(:active_form, ActiveForm.new())
-    |> perform_submit(form, build_payload(form, active_form))
+    |> perform_submit(form, build_payload(form, active_form, submitter), submitter)
   end
 
-  defp perform_submit(session, form, payload) do
+  defp perform_submit(session, form, payload, submitter \\ nil) do
     conn = session.conn
 
     conn
     |> ConnHandler.recycle_all_headers()
-    |> dispatch(@endpoint, form.method, form.action, payload)
+    |> dispatch(
+      @endpoint,
+      Submitter.effective_method(form, submitter),
+      Submitter.effective_action(form, submitter),
+      payload
+    )
     |> maybe_redirect(session)
   end
 
@@ -298,9 +299,13 @@ defmodule PhoenixTest.Static do
     }
   end
 
-  defp build_payload(form, active_form \\ ActiveForm.new()) do
-    form.form_data
-    |> FormData.merge(active_form.form_data)
+  defp build_payload(form, active_form, submitter) do
+    form_data =
+      form.form_data
+      |> FormData.merge(active_form.form_data)
+      |> FormData.merge(Submitter.submitter_data(submitter))
+
+    form_data
     |> FormPayload.new()
     |> FormPayload.add_form_data(active_form.uploads)
   end

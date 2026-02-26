@@ -185,6 +185,29 @@ DoD:
 
 1. Behavioral changes are explicitly documented.
 
+## Phase 10 Spec Reference Docs
+
+Update files:
+
+1. `lib/phoenix_test/element/form.ex` moduledoc and key function docs.
+2. `lib/phoenix_test/dom/form_owner.ex` moduledoc and key function docs.
+3. `lib/phoenix_test/dom/disabled_state.ex` moduledoc and key function docs.
+4. `lib/phoenix_test/dom/successful_controls.ex` moduledoc and key function docs.
+5. `lib/phoenix_test/dom/form_serializer.ex` moduledoc and key function docs.
+6. `lib/phoenix_test/dom/submitter.ex` moduledoc and key function docs.
+
+Reference targets:
+
+1. WHATWG HTML form submission algorithm.
+2. WHATWG HTML successful controls and disabled controls rules.
+3. MDN pages only as explanatory secondary links.
+
+DoD:
+
+1. Each Form/Rules module links to at least one primary spec section.
+2. Publicly-relevant helper functions have brief docstrings citing the rule source.
+3. Docs clearly separate browser-spec behavior from `phoenix_test` compatibility behavior.
+
 ## Suggested Commit Boundaries
 
 1. `test(dom-oracle): add playwright runner and exunit wrapper`
@@ -195,6 +218,7 @@ DoD:
 6. `fix(static): align disabled button behavior with live driver`
 7. `test(dom-oracle): add systematic divergence discovery matrix`
 8. `docs: add conformance notes and upgrade guide`
+9. `docs(dom): add spec-linked moduledocs for form/rules modules`
 
 ## Minimal Acceptance Gate
 

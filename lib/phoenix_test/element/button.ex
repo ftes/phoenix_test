@@ -2,6 +2,7 @@ defmodule PhoenixTest.Element.Button do
   @moduledoc false
 
   alias PhoenixTest.DOM.FormOwner
+  alias PhoenixTest.DOM.Submitter
   alias PhoenixTest.Element
   alias PhoenixTest.Element.Form
   alias PhoenixTest.Html
@@ -9,7 +10,7 @@ defmodule PhoenixTest.Element.Button do
   alias PhoenixTest.Query
   alias PhoenixTest.Utils
 
-  defstruct ~w[parsed id selector text type name value form_id]a
+  defstruct ~w[parsed tag id selector text type name value form_id]a
 
   def find!(html, selector, text) do
     html
@@ -30,7 +31,7 @@ defmodule PhoenixTest.Element.Button do
 
   def find_first_submit(html) do
     html
-    |> Query.find("button:not([type='button'])")
+    |> Query.find("button:not([type='button']):not([type='reset'])")
     |> case do
       {:found, element} -> build(element)
       {:found_many, elements} -> elements |> Enum.at(0) |> build()
@@ -39,16 +40,18 @@ defmodule PhoenixTest.Element.Button do
   end
 
   def build(parsed) do
+    tag = element_tag(parsed)
     id = Html.attribute(parsed, "id")
     name = Html.attribute(parsed, "name")
     value = Html.attribute(parsed, "value") || if name, do: ""
     selector = Element.build_selector(parsed)
     text = Html.element_text(parsed)
-    type = Html.attribute(parsed, "type") || "submit"
+    type = normalize_type(tag, Html.attribute(parsed, "type"))
     form_id = Html.attribute(parsed, "form")
 
     %__MODULE__{
       parsed: parsed,
+      tag: tag,
       id: id,
       selector: selector,
       text: text,
@@ -60,7 +63,7 @@ defmodule PhoenixTest.Element.Button do
   end
 
   def belongs_to_form?(%__MODULE__{} = button, html) do
-    !!button.form_id || (button.type == "submit" && belongs_to_ancestor_form?(button, html))
+    Submitter.submitter?(button) and (!!button.form_id || belongs_to_ancestor_form?(button, html))
   end
 
   defp belongs_to_ancestor_form?(button, html) do
@@ -95,4 +98,15 @@ defmodule PhoenixTest.Element.Button do
       selector -> Form.find!(html, selector)
     end
   end
+
+  defp element_tag(parsed) do
+    case Html.element(parsed) do
+      {tag, _attrs, _children} -> tag
+      _ -> nil
+    end
+  end
+
+  defp normalize_type("button", nil), do: "submit"
+  defp normalize_type(_tag, nil), do: nil
+  defp normalize_type(_tag, type), do: String.downcase(type)
 end

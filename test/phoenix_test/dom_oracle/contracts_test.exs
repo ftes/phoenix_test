@@ -76,7 +76,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       path: "/page/contracts/c006",
       steps: [%{"op" => "click_button", "text" => "External Action", "exact" => true}],
       capture: %{"type" => "submit_result"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C007",
@@ -141,7 +141,7 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       path: "/page/contracts/c012",
       steps: [%{"op" => "click_button", "text" => "Save Override", "exact" => true}],
       capture: %{"type" => "submit_result"},
-      expected: :mismatch
+      expected: :match
     },
     %{
       id: "C013",
@@ -320,10 +320,10 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
   end
 
   defp ours_submit_result(session) do
-    params = session.conn.assigns[:params]
+    params = submitted_params(session.conn)
     submitted = is_map(params)
     effective_method = if submitted, do: String.downcase(session.conn.method)
-    effective_action = if submitted, do: session.current_path
+    effective_action = if submitted, do: session.conn.request_path
 
     %{
       "submitted" => submitted,
@@ -331,6 +331,19 @@ defmodule PhoenixTest.DomOracle.ContractsTest do
       "effective_action" => effective_action,
       "entries" => if(submitted, do: params_to_entries(params), else: [])
     }
+  end
+
+  defp submitted_params(conn) do
+    cond do
+      is_map(conn.assigns[:params]) ->
+        conn.assigns[:params]
+
+      is_map(conn.query_params) and map_size(conn.query_params) > 0 ->
+        conn.query_params
+
+      true ->
+        nil
+    end
   end
 
   defp execute_steps(session, []), do: session

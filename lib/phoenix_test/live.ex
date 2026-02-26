@@ -7,6 +7,7 @@ defmodule PhoenixTest.Live do
   alias PhoenixTest.ActiveForm
   alias PhoenixTest.Assertions
   alias PhoenixTest.ConnHandler
+  alias PhoenixTest.DOM.Submitter
   alias PhoenixTest.Element.Button
   alias PhoenixTest.Element.Field
   alias PhoenixTest.Element.Form
@@ -128,7 +129,6 @@ defmodule PhoenixTest.Live do
 
       Button.belongs_to_form?(button, html) ->
         active_form = session.active_form
-        additional_data = FormData.add_data(FormData.new(), button)
         form = Button.parent_form!(button, html)
 
         form_data =
@@ -140,7 +140,7 @@ defmodule PhoenixTest.Live do
 
         session
         |> Map.put(:active_form, ActiveForm.new())
-        |> submit_form(form.selector, form_data, additional_data)
+        |> submit_form(form.selector, form_data, submitter: button)
 
       Button.has_data_method?(button) ->
         %{session.conn | resp_body: html}
@@ -471,10 +471,10 @@ defmodule PhoenixTest.Live do
     unless ActiveForm.active?(active_form), do: raise(no_active_form_error())
 
     selector = active_form.selector
+    session = set_operation(session, :submit)
+    form = Form.find!(session.current_operation.html, selector)
 
-    session
-    |> set_operation(:submit)
-    |> submit_form(selector, active_form.form_data)
+    submit_form(session, selector, active_form.form_data, submitter: form.submit_button)
   end
 
   defp no_active_form_error do
@@ -483,20 +483,15 @@ defmodule PhoenixTest.Live do
     }
   end
 
-  def submit_form(session, selector, form_data, additional_data \\ FormData.new()) do
+  def submit_form(session, selector, form_data, opts \\ []) when is_list(opts) do
+    submitter = Keyword.get(opts, :submitter)
+    additional_data = Keyword.get(opts, :additional_data, FormData.new())
     form = Form.find!(session.current_operation.html, selector)
 
     form_data = remove_data_for_fields_that_have_been_removed(form_data, form)
     form_data = FormData.merge(form.form_data, form_data)
 
-    additional_data =
-      if form.submit_button do
-        FormData.new()
-        |> FormData.add_data(form.submit_button)
-        |> FormData.merge(additional_data)
-      else
-        additional_data
-      end
+    additional_data = FormData.merge(Submitter.submitter_data(submitter), additional_data)
 
     cond do
       Form.phx_submit?(form) ->
@@ -508,7 +503,7 @@ defmodule PhoenixTest.Live do
       Form.has_action?(form) ->
         session.conn
         |> PhoenixTest.Static.build()
-        |> PhoenixTest.Static.submit_form(selector, form_data)
+        |> PhoenixTest.Static.submit_form(selector, form_data, submitter)
 
       true ->
         raise ArgumentError,

@@ -210,9 +210,21 @@ defmodule PhoenixTest.Element.ButtonTest do
       refute Button.belongs_to_form?(button, html)
     end
 
-    test "returns true if button has a form attribute" do
+    test "returns false if non-submit button has a form attribute" do
       html = """
-      <button form="form-id">
+      <button type="button" form="form-id">
+        Save
+      </button>
+      """
+
+      button = Button.find!(html, "button", "Save")
+
+      refute Button.belongs_to_form?(button, html)
+    end
+
+    test "returns true if submit button has a form attribute" do
+      html = """
+      <button type="submit" form="form-id">
         Save
       </button>
       """
