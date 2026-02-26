@@ -255,6 +255,21 @@ Execution note:
 
 1. Do not run multiple `mix test ...` commands in parallel in this project; test endpoint uses a fixed port (`4000`) and parallel runs will conflict.
 
+## Phase 13 Priority Order (Current)
+
+Priority order:
+
+1. Run full regression gate first: `mix test` (sequential execution only).
+2. Reduce duplication between static and live parity suites by extracting shared parity harness code.
+3. Continue refactoring boundaries so DOM-spec rules stay in `lib/phoenix_test/dom/*` and Phoenix-specific behavior is isolated in adapter/driver layers.
+4. Implement image submitter coordinates parity (`C017`) after priorities 1-3 are complete.
+
+DoD:
+
+1. `mix test` passes after each priority boundary.
+2. Static/live parity tests stay green while refactors are applied.
+3. No new behavior coupling is introduced between DOM-rule modules and Phoenix transport/event specifics.
+
 ## Suggested Commit Boundaries
 
 1. `test(dom-oracle): add playwright runner and exunit wrapper`
